@@ -1,17 +1,17 @@
 package com.bimface.sdk.service;
 
-import java.util.List;
-
 import com.alibaba.fastjson.TypeReference;
 import com.bimface.sdk.bean.GeneralResponse;
 import com.bimface.sdk.bean.request.FileUploadRequest;
 import com.bimface.sdk.bean.response.FileBean;
+import com.bimface.sdk.bean.response.SupportFileBean;
 import com.bimface.sdk.config.Endpoint;
 import com.bimface.sdk.exception.BimfaceException;
 import com.bimface.sdk.http.HttpHeaders;
 import com.bimface.sdk.http.HttpUtils;
 import com.bimface.sdk.http.ServiceClient;
 import com.bimface.sdk.utils.AssertUtils;
+import com.bimface.sdk.utils.FileNameUtils;
 import com.squareup.okhttp.Response;
 
 /**
@@ -21,8 +21,8 @@ import com.squareup.okhttp.Response;
  */
 public class UploadService extends AbstractAccessTokenService {
 
-    private final String       UPLOAD_URL        = getFileHost() + "/upload?name=%s&suffix=%s";
-    private final String       UPLOAD_BY_URL_URL = getFileHost() + "/upload?name=%s&suffix=%s&url=%s";
+    private final String       UPLOAD_URL        = getFileHost() + "/upload?name=%s";
+    private final String       UPLOAD_BY_URL_URL = getFileHost() + "/upload?name=%s&url=%s";
 
     private SupportFileService supportFileService;
 
@@ -32,7 +32,6 @@ public class UploadService extends AbstractAccessTokenService {
 
     public FileBean upload(FileUploadRequest fileUploadRequest) throws BimfaceException {
 
-        // 参数校验
         check(fileUploadRequest);
 
         HttpHeaders headers = new HttpHeaders();
@@ -40,11 +39,10 @@ public class UploadService extends AbstractAccessTokenService {
         Response response = null;
         String requestUrl = null;
         if (fileUploadRequest.isByUrl()) {
-            requestUrl = String.format(UPLOAD_BY_URL_URL, fileUploadRequest.getName(), fileUploadRequest.getSuffix(),
-                                       fileUploadRequest.getUrl());
+            requestUrl = String.format(UPLOAD_BY_URL_URL, fileUploadRequest.getName(), fileUploadRequest.getUrl());
             response = getServiceClient().put(requestUrl, headers);
         } else {
-            requestUrl = String.format(UPLOAD_URL, fileUploadRequest.getName(), fileUploadRequest.getSuffix());
+            requestUrl = String.format(UPLOAD_URL, fileUploadRequest.getName());
             headers.addHeader(HttpHeaders.CONTENT_LENGTH, fileUploadRequest.getContentLength().toString());
             response = getServiceClient().put(requestUrl, fileUploadRequest.getInputStream(),
                                               fileUploadRequest.getContentLength(), headers);
@@ -53,16 +51,33 @@ public class UploadService extends AbstractAccessTokenService {
     }
 
     private void check(FileUploadRequest fileUploadRequest) throws BimfaceException {
+
         AssertUtils.assertParameterNotNull(fileUploadRequest, "fileUploadRequest");
-        if (fileUploadRequest.getUrl() == null) {
-            if (fileUploadRequest.getContentLength() == null && fileUploadRequest.getContentLength() < 0) {
-                throw new IllegalArgumentException("ParameterLongIsEmpty ContentLength");
+
+        // 文件名校验
+        FileNameUtils.checkFileName(fileUploadRequest.getName());
+
+        // 检查文件内容
+        if (fileUploadRequest.isByUrl()) {
+
+            // 如果是URL方式上传
+            AssertUtils.checkUrl(fileUploadRequest.getUrl());
+
+        } else {
+
+            // 如果是普通流上传
+            if (fileUploadRequest.getContentLength() == null || fileUploadRequest.getContentLength() < 0) {
+                throw new IllegalArgumentException("ContentLength is null.");
             }
             AssertUtils.assertParameterNotNull(fileUploadRequest.getInputStream(), "inputStream");
         }
-        AssertUtils.checkFileName(fileUploadRequest.getName());
-        List<String> allSupportedType = getSupportFileService().getSupportFile();
-        AssertUtils.checkFileSuffix(allSupportedType, fileUploadRequest.getSuffix());
+        SupportFileBean supportFileBean = getSupportFileService().getSupport();
+        String[] allSupportedType = supportFileBean.getTypes();
+        // 检查文件格式是否支持
+        FileNameUtils.checkFileType(allSupportedType, fileUploadRequest.getName());
+        //检查文件长度是否支持
+        AssertUtils.checkFileLength(supportFileBean.getLength(), fileUploadRequest.getContentLength());
+
     }
 
     public void setSupportFileService(SupportFileService supportFileService) {

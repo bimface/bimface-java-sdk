@@ -18,62 +18,48 @@ import com.squareup.okhttp.Response;
  */
 public class ShareLinkService extends AbstractAccessTokenService {
 
-    private final String CREATE_SHARE_URL = getApiHost() + "/share?viewId=%s&activeHours=%s";
-    private final String UPDATE_SHARE_URL = getApiHost() + "/share?viewId=%s&activeHours=%s";
-    private final String GET_SHARE_URL    = getApiHost() + "/share?viewId=%s";
-    private final String DELETE_SHARE_URL = getApiHost() + "/share?viewId=%s";
+    private final String CREATE_SHARE_URL         = getApiHost() + "/share?transferId=%s&activeHours=%s";
+    private final String CREATE_SHARE_URL_FOREVER = getApiHost() + "/share?transferId=%s";
+    private final String DELETE_SHARE_URL         = getApiHost() + "/share?transferId=%s";
 
     public ShareLinkService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
         super(serviceClient, endpoint, accessTokenService);
     }
 
-    public ShareLinkBean create(String viewId, Integer activeHours) throws BimfaceException {
+    public ShareLinkBean create(String transferId, Integer activeHours) throws BimfaceException {
 
         // 参数校验
-        AssertUtils.assertStringNotNullOrEmpty(viewId, "viewId");
+        AssertUtils.assertStringNotNullOrEmpty(transferId, "transferId");
         if (activeHours != null && activeHours <= 0) {
             throw new IllegalArgumentException("activeHours must not less than zero.");
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().post(String.format(CREATE_SHARE_URL, viewId, activeHours), "", headers);
+        Response response = getServiceClient().post(String.format(CREATE_SHARE_URL, transferId, activeHours), "",
+                                                    headers);
         return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
     }
 
-    public ShareLinkBean get(String viewId) throws BimfaceException {
+    public ShareLinkBean create(String transferId) throws BimfaceException {
 
         // 参数校验
-        AssertUtils.assertStringNotNullOrEmpty(viewId, "viewId");
+        AssertUtils.assertStringNotNullOrEmpty(transferId, "transferId");
 
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(GET_SHARE_URL, viewId), headers);
+        Response response = getServiceClient().post(String.format(CREATE_SHARE_URL_FOREVER, transferId), "", headers);
         return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
     }
 
-    public ShareLinkBean update(String viewId, Integer activeHours) throws BimfaceException {
+    public String delete(String transferId) throws BimfaceException {
 
         // 参数校验
-        AssertUtils.assertStringNotNullOrEmpty(viewId, "viewId");
-        if (activeHours != null && activeHours <= 0) {
-            throw new IllegalArgumentException("activeHours must not less than zero.");
-        }
+        AssertUtils.assertStringNotNullOrEmpty(transferId, "transferId");
 
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().put(String.format(UPDATE_SHARE_URL, viewId, activeHours), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
-    }
-
-    public String delete(String viewId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertStringNotNullOrEmpty(viewId, "viewId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().delete(String.format(DELETE_SHARE_URL, viewId), headers);
+        Response response = getServiceClient().delete(String.format(DELETE_SHARE_URL, transferId), headers);
         return HttpUtils.response(response, new TypeReference<GeneralResponse<String>>() {});
     }
 }

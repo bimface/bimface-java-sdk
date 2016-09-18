@@ -30,7 +30,7 @@ public class BimfaceException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public int getHttpCode() {
+    public Integer getHttpCode() {
         return httpCode;
     }
 

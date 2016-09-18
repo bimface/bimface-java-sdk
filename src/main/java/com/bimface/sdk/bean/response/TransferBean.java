@@ -11,22 +11,22 @@ import com.bimface.sdk.constants.TransferStatus;
  */
 public class TransferBean {
 
-    private String   viewId;    // 浏览ID
-    private String   name;      // 文件名称，包括后缀
-    private String   status;    // 转换状态
-    private String[] thumbnail; // 缩略图路径
-    private String   reason;    // 转换失败的原因描述
-    private String   createTime;// 启动转换的时间，格式：yyyy-MM-dd hh:mm:ss
+    private String   transferId; // 转换ID
+    private String   name;       // 文件名称，包括后缀
+    private String   status;     // 转换状态
+    private String[] thumbnail;  // 缩略图路径
+    private String   reason;     // 转换失败的原因描述
+    private String   createTime; // 启动转换的时间，格式：yyyy-MM-dd hh:mm:ss
 
     public TransferBean() {
     }
 
-    public String getViewId() {
-        return viewId;
+    public String getTransferId() {
+        return transferId;
     }
 
-    public void setViewId(String viewId) {
-        this.viewId = viewId;
+    public void setTransferId(String transferId) {
+        this.transferId = transferId;
     }
 
     public String getName() {
@@ -75,7 +75,8 @@ public class TransferBean {
 
     @Override
     public String toString() {
-        return "TransferBean [viewId=" + viewId + ", name=" + name + ", status=" + status + ", thumbnail="
+        return "TransferBean [transferId=" + transferId + ", name=" + name + ", status=" + status + ", thumbnail="
                + Arrays.toString(thumbnail) + ", reason=" + reason + ", createTime=" + createTime + "]";
     }
+
 }

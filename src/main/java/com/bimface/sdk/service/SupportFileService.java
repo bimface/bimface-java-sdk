@@ -1,9 +1,8 @@
 package com.bimface.sdk.service;
 
-import java.util.List;
-
 import com.alibaba.fastjson.TypeReference;
 import com.bimface.sdk.bean.GeneralResponse;
+import com.bimface.sdk.bean.response.SupportFileBean;
 import com.bimface.sdk.config.Endpoint;
 import com.bimface.sdk.exception.BimfaceException;
 import com.bimface.sdk.http.HttpHeaders;
@@ -18,25 +17,29 @@ import com.squareup.okhttp.Response;
  */
 public class SupportFileService extends AbstractAccessTokenService {
 
-    private List<String> supportFile;
+    private SupportFileBean supportFileBean;
 
-    private final String SUPPORT_FILE_URL = getApiHost() + "/support";
+    private final String    SUPPORT_FILE_URL = getFileHost() + "/support";
 
     public SupportFileService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
         super(serviceClient, endpoint, accessTokenService);
     }
 
-    public List<String> getSupportFile() throws BimfaceException {
+    /**
+     * @return {@link SupportFileBean}
+     * @throws BimfaceException
+     */
+    public SupportFileBean getSupport() throws BimfaceException {
 
-        // 在缓存中获取
-        if (supportFile != null && !supportFile.isEmpty()) {
-            return supportFile;
+        // 从缓存返回
+        if (supportFileBean != null) {
+            return supportFileBean;
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
         Response response = getServiceClient().get(SUPPORT_FILE_URL, headers);
-        supportFile = HttpUtils.response(response, new TypeReference<GeneralResponse<List<String>>>() {});
-        return supportFile;
+        supportFileBean = HttpUtils.response(response, new TypeReference<GeneralResponse<SupportFileBean>>() {});
+        return supportFileBean;
     }
 }

@@ -20,7 +20,7 @@ import com.squareup.okhttp.Response;
 public class TransferService extends AbstractAccessTokenService {
 
     private final String TRANSFER_URL     = getApiHost() + "/transfer";
-    private final String GET_TRANSFER_URL = getApiHost() + "/transfer?viewId=%s";
+    private final String GET_TRANSFER_URL = getApiHost() + "/transfer?transferId=%s";
 
     public TransferService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
         super(serviceClient, endpoint, accessTokenService);
@@ -37,14 +37,14 @@ public class TransferService extends AbstractAccessTokenService {
         return HttpUtils.response(response, new TypeReference<GeneralResponse<TransferBean>>() {});
     }
 
-    public TransferBean getTransfer(String viewId) throws BimfaceException {
+    public TransferBean getTransfer(String transferId) throws BimfaceException {
 
         // 参数校验
-        AssertUtils.assertStringNotNullOrEmpty(viewId, "viewId");
+        AssertUtils.assertStringNotNullOrEmpty(transferId, "transferId");
 
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(GET_TRANSFER_URL, viewId), headers);
+        Response response = getServiceClient().get(String.format(GET_TRANSFER_URL, transferId), headers);
         return HttpUtils.response(response, new TypeReference<GeneralResponse<TransferBean>>() {});
     }
 

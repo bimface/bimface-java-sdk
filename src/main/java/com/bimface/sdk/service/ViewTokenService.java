@@ -17,17 +17,17 @@ import com.squareup.okhttp.Response;
  */
 public class ViewTokenService extends AbstractAccessTokenService {
 
-    private final String VIEW_TOKEN_URL = getApiHost() + "/view/token?viewId=%s";
+    private final String VIEW_TOKEN_URL = getApiHost() + "/view/token?transferId=%s";
 
     public ViewTokenService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
         super(serviceClient, endpoint, accessTokenService);
     }
 
-    public String grantViewToken(String viewId) throws BimfaceException {
-        AssertUtils.assertStringNotNullOrEmpty(viewId, "viewId");
+    public String grantViewToken(String transferId) throws BimfaceException {
+        AssertUtils.assertStringNotNullOrEmpty(transferId, "transferId");
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(VIEW_TOKEN_URL, viewId), headers);
+        Response response = getServiceClient().get(String.format(VIEW_TOKEN_URL, transferId), headers);
         return HttpUtils.response(response, new TypeReference<GeneralResponse<String>>() {});
     }
 }

@@ -42,7 +42,7 @@ public class DefaultAccessTokenStorage implements AccessTokenStorage {
         try {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date expire = dateFormat.parse(accessTokenBean.getExpireTime());
-            return (expire.getTime() - new Date().getTime()) <= 1000; // 时间需要大于1秒
+            return (expire.getTime() - System.currentTimeMillis()) <= 1000; // 时间需要大于1秒
         } catch (ParseException e) {
             return true;
         }

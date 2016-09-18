@@ -13,6 +13,15 @@ public class FileTransferRequest {
     public FileTransferRequest() {
     }
 
+    public FileTransferRequest(Long fileId) {
+        this.fileId = fileId;
+    }
+
+    public FileTransferRequest(Long fileId, String callback) {
+        this.fileId = fileId;
+        this.callback = callback;
+    }
+
     public Long getFileId() {
         return fileId;
     }
