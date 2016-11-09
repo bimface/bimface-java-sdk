@@ -9,6 +9,7 @@ public class FileBean {
 
     private Long   fileId;    // 文件ID
     private String name;      // 文件名称，包括后缀
+    private String etag;      // 文件的md5值
     private String suffix;    // 文件后缀
     private Long   length;    // 文件大小，（单位：byte）
     private String createTime;// 上传时间，格式：yyyy-MM-dd hh:mm:ss
@@ -30,6 +31,14 @@ public class FileBean {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEtag() {
+        return etag;
+    }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
     }
 
     public String getSuffix() {
@@ -58,7 +67,7 @@ public class FileBean {
 
     @Override
     public String toString() {
-        return "FileBean [fileId=" + fileId + ", name=" + name + ", suffix=" + suffix + ", length=" + length
-               + ", createTime=" + createTime + "]";
+        return "FileBean [fileId=" + fileId + ", name=" + name + ", etag=" + etag + ", suffix=" + suffix + ", length="
+               + length + ", createTime=" + createTime + "]";
     }
 }

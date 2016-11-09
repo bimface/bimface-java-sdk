@@ -111,7 +111,7 @@ public class ServiceClient {
         return post(url, requestIO(inputStream, contentLength), headers);
     }
 
-    private Response post(String url, RequestBody body, HttpHeaders headers) throws BimfaceException {
+    public Response post(String url, RequestBody body, HttpHeaders headers) throws BimfaceException {
         Request.Builder requestBuilder = new Request.Builder().url(url).post(body);
         return send(requestBuilder, Headers.of(headers.getHeaders()));
     }

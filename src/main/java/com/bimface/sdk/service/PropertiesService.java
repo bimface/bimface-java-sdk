@@ -18,7 +18,7 @@ import com.squareup.okhttp.Response;
  */
 public class PropertiesService extends AbstractAccessTokenService {
 
-    private final String PROPERTIES_URL = getApiHost() + "/attribute?transferId=%s&elementId=%s";
+    private final String PROPERTIES_URL = getApiHost() + "/data/element/properties?transferId=%s&elementId=%s";
 
     public PropertiesService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
         super(serviceClient, endpoint, accessTokenService);

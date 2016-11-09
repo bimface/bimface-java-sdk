@@ -1,14 +1,11 @@
 package com.bimface.sdk;
 
 import java.io.InputStream;
+import java.util.List;
 
 import com.bimface.sdk.bean.request.FileTransferRequest;
 import com.bimface.sdk.bean.request.FileUploadRequest;
-import com.bimface.sdk.bean.response.FileBean;
-import com.bimface.sdk.bean.response.PropertiesBean;
-import com.bimface.sdk.bean.response.ShareLinkBean;
-import com.bimface.sdk.bean.response.SupportFileBean;
-import com.bimface.sdk.bean.response.TransferBean;
+import com.bimface.sdk.bean.response.*;
 import com.bimface.sdk.config.Config;
 import com.bimface.sdk.config.Endpoint;
 import com.bimface.sdk.config.authorization.AccessTokenStorage;
@@ -16,18 +13,11 @@ import com.bimface.sdk.config.authorization.Credential;
 import com.bimface.sdk.config.authorization.DefaultAccessTokenStorage;
 import com.bimface.sdk.exception.BimfaceException;
 import com.bimface.sdk.http.ServiceClient;
-import com.bimface.sdk.service.AccessTokenService;
-import com.bimface.sdk.service.PropertiesService;
-import com.bimface.sdk.service.ShareLinkService;
-import com.bimface.sdk.service.SignatureService;
-import com.bimface.sdk.service.SupportFileService;
-import com.bimface.sdk.service.TransferService;
-import com.bimface.sdk.service.UploadService;
-import com.bimface.sdk.service.ViewTokenService;
+import com.bimface.sdk.service.*;
 
 /**
  * 访问bimface服务的入口
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class BimfaceClient {
@@ -45,6 +35,10 @@ public class BimfaceClient {
     private ShareLinkService   shareLinkService;
     private PropertiesService  propertiesService;
     private SignatureService   signatureService;
+    private DownloadService    downloadService;
+    private ElementService     elementService;
+    private FileService        fileService;
+    private CategoryService    categoryService;
 
     /**
      * 构造BimfaceClient对象
@@ -126,6 +120,10 @@ public class BimfaceClient {
         shareLinkService = new ShareLinkService(serviceClient, this.endpoint, accessTokenService);
         propertiesService = new PropertiesService(serviceClient, this.endpoint, accessTokenService);
         signatureService = new SignatureService(credential);
+        downloadService = new DownloadService(serviceClient, this.endpoint, accessTokenService);
+        elementService = new ElementService(serviceClient, this.endpoint, accessTokenService);
+        fileService = new FileService(serviceClient, this.endpoint, accessTokenService);
+        categoryService = new CategoryService(serviceClient, this.endpoint, accessTokenService);
     }
 
     /**
@@ -136,6 +134,17 @@ public class BimfaceClient {
      */
     public SupportFileBean getSupport() throws BimfaceException {
         return supportFileService.getSupport();
+    }
+
+    /**
+     * 获取文件元属性
+     *
+     * @param fileId 文件id
+     * @return {@link FileBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public FileBean getFileMetadata(Long fileId) throws BimfaceException {
+        return fileService.getFileMetadata(fileId);
     }
 
     /**
@@ -172,6 +181,82 @@ public class BimfaceClient {
      */
     public FileBean upload(String name, String url) throws BimfaceException {
         return uploadService.upload(new FileUploadRequest(name, url));
+    }
+
+    /**
+     * 获取上传凭证，用于直传到OSS
+     *
+     * @param name 文件名
+     * @return {@link UploadPolicyBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public UploadPolicyBean getPolicy(String name) throws BimfaceException {
+        return uploadService.getPolicy(name);
+    }
+
+    /**
+     * 基于阿里云的policy机制，将文件直接上传阿里云 分两步：1. 调用bimface接口取得policy；2. 用policy将文件直接上传阿里云
+     * 
+     * @param name 文件名
+     * @param contentLength 文件内容长度
+     * @param inputStream 文件流
+     * @return {@link FileBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public FileBean uploadByPolicy(String name, Long contentLength, InputStream inputStream) throws BimfaceException {
+        return uploadService.uploadByPolicy(name, contentLength, inputStream);
+    }
+
+    /**
+     * 获取文件下载链接，直接从OSS下载
+     *
+     * @param fileId 文件ID
+     * @return
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public String getDownloadUrl(Long fileId) throws BimfaceException {
+        return downloadService.getDownloadUrl(fileId);
+    }
+
+    /**
+     * 获取文件下载链接，直接从OSS下载
+     *
+     * @param fileId 文件ID
+     * @param fileName 文件名
+     * @return
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public String getDownloadUrl(Long fileId, String fileName) throws BimfaceException {
+        return downloadService.getDownloadUrl(fileId, fileName);
+    }
+
+    /**
+     * 获取文件流
+     * 
+     * @param fileId 文件id
+     * @param fileName 文件名
+     * @return
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public InputStream download(Long fileId, String fileName) throws BimfaceException {
+        return downloadService.getFileContent(fileId, fileName);
+    }
+
+    /**
+     * 通过条件查询构件ID组
+     *
+     * @param transferId 转换ID
+     * @param categoryId 构件类型ID
+     * @param family 族名称
+     * @param familyType 族类型
+     * @param start 开始位置
+     * @param end 结束位置
+     * @return
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public List<String> getElements(String transferId, String categoryId, String family, String familyType,
+                                    Integer start, Integer end) throws BimfaceException {
+        return elementService.getElements(transferId, categoryId, family, familyType, start, end);
     }
 
     /**
@@ -276,6 +361,17 @@ public class BimfaceClient {
     }
 
     /**
+     * 获取构件分类树
+     *
+     * @param transferId 文件转换id
+     * @return {@link CategoryBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public List<CategoryBean> getCategory(String transferId) throws BimfaceException {
+        return categoryService.getCategory(transferId);
+    }
+
+    /**
      * 验证签名, 接收转换回调时使用
      * 
      * @param signature 签名字符
@@ -333,4 +429,19 @@ public class BimfaceClient {
         return signatureService;
     }
 
+    public DownloadService getDownloadService() {
+        return downloadService;
+    }
+
+    public ElementService getElementService() {
+        return elementService;
+    }
+
+    public FileService getFileService() {
+        return fileService;
+    }
+
+    public CategoryService getCategoryService() {
+        return categoryService;
+    }
 }

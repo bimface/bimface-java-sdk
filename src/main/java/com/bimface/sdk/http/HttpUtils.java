@@ -1,6 +1,7 @@
 package com.bimface.sdk.http;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -17,17 +18,28 @@ public class HttpUtils {
 
     public static <T> T response(Response response,
                                  TypeReference<GeneralResponse<T>> typeReference) throws BimfaceException {
-        String body = "";
         try {
-            body = response.body().string();
+            String body = response.body().string();
+            if (response.isSuccessful()) {
+                GeneralResponse<T> generalResponse = JSONObject.parseObject(body, typeReference);
+                if (GeneralResponse.CODE_SUCCESS.equalsIgnoreCase(generalResponse.getCode())) {
+                    return generalResponse.getData();
+                } else {
+                    throw new BimfaceException(generalResponse.getMessage(), generalResponse.getCode());
+                }
+            } else {
+                throw new BimfaceException(body, response.code());
+            }
         } catch (IOException e) {
             throw new BimfaceException(e);
         }
-        GeneralResponse<T> generalResponse = JSONObject.parseObject(body, typeReference);
-        if (GeneralResponse.CODE_SUCCESS.equalsIgnoreCase(generalResponse.getCode())) {
-            return generalResponse.getData();
-        } else {
-            throw new BimfaceException(generalResponse.getMessage(), generalResponse.getCode());
+    }
+
+    public static InputStream response(Response response) throws BimfaceException {
+        try {
+            return response.body().byteStream();
+        } catch (IOException e) {
+            throw new BimfaceException(e);
         }
     }
 }
