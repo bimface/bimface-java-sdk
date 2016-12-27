@@ -1,18 +1,22 @@
 package com.bimface.sdk.bean.response;
 
+import java.io.Serializable;
+
 /**
  * 文件上传的返回参数
  * 
  * @author bimface, 2016-06-01.
  */
-public class FileBean {
+public class FileBean implements Serializable {
 
-    private Long   fileId;    // 文件ID
-    private String name;      // 文件名称，包括后缀
-    private String etag;      // 文件的md5值
-    private String suffix;    // 文件后缀
-    private Long   length;    // 文件大小，（单位：byte）
-    private String createTime;// 上传时间，格式：yyyy-MM-dd hh:mm:ss
+    private static final long serialVersionUID = 931141851693960861L;
+    private Long              fileId;                                // 文件ID
+    private String            name;                                  // 文件名称，包括后缀
+    private String            status;                                // 上传状态
+    private String            etag;                                  // 文件的md5值
+    private String            suffix;                                // 文件后缀
+    private Long              length;                                // 文件大小，（单位：byte）
+    private String            createTime;                            // 上传时间，格式：yyyy-MM-dd hh:mm:ss
 
     public FileBean() {
     }
@@ -31,6 +35,14 @@ public class FileBean {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getEtag() {

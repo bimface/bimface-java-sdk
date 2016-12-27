@@ -13,21 +13,24 @@ import com.bimface.sdk.constants.BimfaceConstants;
  */
 public class FileUploadRequest {
 
-    private String      name;         // 文件名称，包括后缀名
-    private Long        contentLength;// 文件长度
-    private InputStream inputStream;  // 文件流
-    private String      url;          // 文件的下载地址，如果提供了下载地址，则无需设置inputStream、contentLength
+    private String      name;          // 文件名称，包括后缀名
+    private String      sourceId;      // 源文件Id
+    private Long        contentLength; // 文件长度
+    private InputStream inputStream;   // 文件流
+    private String      url;           // 文件的下载地址，如果提供了下载地址，则无需设置inputStream、contentLength
 
     public FileUploadRequest() {
     }
 
-    public FileUploadRequest(String name, String url) {
+    public FileUploadRequest(String name, String sourceId, String url) {
         this.name = name;
+        this.sourceId = sourceId;
         this.url = url;
     }
 
-    public FileUploadRequest(String name, Long contentLength, InputStream inputStream) {
+    public FileUploadRequest(String name, String sourceId, Long contentLength, InputStream inputStream) {
         this.name = name;
+        this.sourceId = sourceId;
         this.contentLength = contentLength;
         this.inputStream = inputStream;
     }
@@ -42,6 +45,21 @@ public class FileUploadRequest {
         }
         try {
             this.name = URLEncoder.encode(name, BimfaceConstants.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            // ignore
+        }
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        if (sourceId == null) {
+            return;
+        }
+        try {
+            this.sourceId = URLEncoder.encode(sourceId, BimfaceConstants.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // ignore
         }

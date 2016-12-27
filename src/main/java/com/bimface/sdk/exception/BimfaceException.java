@@ -8,7 +8,6 @@ package com.bimface.sdk.exception;
 public class BimfaceException extends Exception {
 
     private static final long serialVersionUID = 2192833742497163711L;
-
     private Integer           httpCode;
     private String            errorCode;
 

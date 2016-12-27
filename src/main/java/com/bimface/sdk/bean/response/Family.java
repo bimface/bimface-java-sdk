@@ -1,5 +1,6 @@
 package com.bimface.sdk.bean.response;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,28 +8,31 @@ import java.util.List;
  *
  * @author bimface, 2016-11-01.
  */
-public class Family {
-    private String familyName; // 族名称
-    private List<String> types; // 族类型
+public class Family implements Serializable {
 
-    public String getFamilyName() {
-        return familyName;
+    private static final long serialVersionUID = -3941838803765875345L;
+    private String            family;                                  // 族名称
+    private List<String>      familyTypes;                             // 族类型
+
+    public String getFamily() {
+        return family;
     }
 
-    public void setFamilyName(String familyName) {
-        this.familyName = familyName;
+    public void setFamily(String family) {
+        this.family = family;
     }
 
-    public List<String> getTypes() {
-        return types;
+    public List<String> getFamilyTypes() {
+        return familyTypes;
     }
 
-    public void setTypes(List<String> types) {
-        this.types = types;
+    public void setFamilyTypes(List<String> familyTypes) {
+        this.familyTypes = familyTypes;
     }
 
     @Override
     public String toString() {
-        return "Family [name=" + familyName + ", types=" + types + "]";
+        return "Family [family=" + family + ", familyTypes=" + familyTypes + "]";
     }
+
 }

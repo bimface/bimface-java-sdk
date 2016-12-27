@@ -17,29 +17,25 @@ import com.squareup.okhttp.Response;
  */
 public class SupportFileService extends AbstractAccessTokenService {
 
-    private SupportFileBean supportFileBean;
-
-    private final String    SUPPORT_FILE_URL = getFileHost() + "/support";
+    private final String SUPPORT_FILE_URL = getFileHost() + "/support";
 
     public SupportFileService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
         super(serviceClient, endpoint, accessTokenService);
     }
 
     /**
+     * 获取支持上传文件格式和文件大小
+     * 
      * @return {@link SupportFileBean}
-     * @throws BimfaceException
+     * @throws BimfaceException {@link BimfaceException}
      */
     public SupportFileBean getSupport() throws BimfaceException {
-
-        // 从缓存返回
-        if (supportFileBean != null) {
-            return supportFileBean;
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.addOAuth2Header(getAccessToken());
         Response response = getServiceClient().get(SUPPORT_FILE_URL, headers);
-        supportFileBean = HttpUtils.response(response, new TypeReference<GeneralResponse<SupportFileBean>>() {});
+        SupportFileBean supportFileBean = HttpUtils.response(response,
+                                                             new TypeReference<GeneralResponse<SupportFileBean>>() {});
         return supportFileBean;
     }
 }

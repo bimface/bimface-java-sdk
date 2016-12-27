@@ -1,19 +1,22 @@
 package com.bimface.sdk.bean.response;
 
+import java.io.Serializable;
+
 /**
  * 上传策略实体
  * 
  * @author bimface, 2016-06-01.
  */
-public class UploadPolicyBean {
+public class UploadPolicyBean implements Serializable {
 
-    private String host;        // 域名
-    private String policy;      // 上传策略
-    private String accessId;    // OSS的访问ID
-    private String signature;   // OSS签名
-    private Long   expire;      // 超时时间,单位秒
-    private String callbackBody;// 回调体
-    private String objectKey;   // OSS中存储对象的key
+    private static final long serialVersionUID = 2549276583284981854L;
+    private String            host;                                   // 域名
+    private String            policy;                                 // 上传策略
+    private String            accessId;                               // OSS的访问ID
+    private String            signature;                              // OSS签名
+    private Long              expire;                                 // 超时时间,单位秒
+    private String            callbackBody;                           // 回调体
+    private String            objectKey;                              // OSS中存储对象的key
 
     public UploadPolicyBean() {
     }

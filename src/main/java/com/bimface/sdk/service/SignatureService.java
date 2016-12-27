@@ -21,19 +21,19 @@ public class SignatureService {
      * 校验签名方法,针对于回调函数验证是否为bimface发起
      * 
      * @param signature 回调时带的签名
-     * @param transferId 转换时返回的预览ID
+     * @param id 可能是fileId或integrateId
      * @param status 转换状态(success || failed)
      * @return true: 验证成功, false: 校验失败
      */
-    public boolean validate(String signature, String transferId, String status, String nonce) {
+    public boolean validate(String signature, String id, String status, String nonce) {
 
         AssertUtils.assertStringNotNullOrEmpty(signature, "signature");
-        AssertUtils.assertStringNotNullOrEmpty(transferId, "transferId");
+        AssertUtils.assertStringNotNullOrEmpty(id, "id");
         AssertUtils.assertStringNotNullOrEmpty(status, "status");
         AssertUtils.assertStringNotNullOrEmpty(nonce, "nonce");
-        
-        // 回调签名 MD5(appKey:appSecret:transferId:status:nonce)
-        StringBuffer sb = new StringBuffer(credential.getAppKey()).append(":").append(credential.getAppSecret()).append(":").append(transferId).append(":").append(status).append(":").append(nonce);
+
+        // 回调签名 MD5(appKey:appSecret:id:status:nonce)
+        StringBuffer sb = new StringBuffer(credential.getAppKey()).append(":").append(credential.getAppSecret()).append(":").append(id).append(":").append(status).append(":").append(nonce);
         return signature.equalsIgnoreCase(MD5Util.MD5(sb.toString()));
     }
 }

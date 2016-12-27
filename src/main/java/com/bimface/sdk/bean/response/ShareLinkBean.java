@@ -1,14 +1,17 @@
 package com.bimface.sdk.bean.response;
 
+import java.io.Serializable;
+
 /**
  * 分享链接的返回参数
  * 
  * @author bimface, 2016-06-01.
  */
-public class ShareLinkBean {
+public class ShareLinkBean implements Serializable {
 
-    private String url;       // 分享链接的URL
-    private String expireTime;// 分享链接的过期时间，格式：yyyy-MM-dd hh:mm:ss
+    private static final long serialVersionUID = 5433443661267897028L;
+    private String            url;                                    // 分享链接的URL
+    private String            expireTime;                             // 分享链接的过期时间，格式：yyyy-MM-dd hh:mm:ss
 
     public ShareLinkBean() {
     }

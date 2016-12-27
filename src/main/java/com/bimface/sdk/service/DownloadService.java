@@ -28,8 +28,8 @@ public class DownloadService extends AbstractAccessTokenService {
     /**
      * 获取文件下载链接
      * 
-     * @param fileId
-     * @return
+     * @param fileId 文件Id
+     * @return String
      * @throws BimfaceException
      */
     public String getDownloadUrl(Long fileId) throws BimfaceException {
@@ -39,8 +39,8 @@ public class DownloadService extends AbstractAccessTokenService {
     /**
      * 获取文件下载链接
      * 
-     * @param fileId
-     * @return
+     * @param fileId 文件Id
+     * @return String
      * @throws BimfaceException
      */
     public String getDownloadUrl(Long fileId, String fileName) throws BimfaceException {
