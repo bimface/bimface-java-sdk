@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.bimface.sdk.bean.response.AccessTokenBean;
-import com.bimface.sdk.exception.BimfaceException;
 
 /**
  * 默认情况下，缓存AccessToken的方式
@@ -36,7 +35,6 @@ public class DefaultAccessTokenStorage implements AccessTokenStorage {
      * 
      * @param expireTime 过期时间
      * @return true:已过期或即将过期, false:未过期
-     * @throws BimfaceException {@link BimfaceException}异常
      */
     private boolean maybeExpire(String expireTime) {
         try {

@@ -3,7 +3,7 @@ package com.bimface.sdk.constants;
 /**
  * 枚举：回调状态
  * 
- * @author bimface, 2016-06-01.
+ * @author bimface, 2016-06-01. 
  */
 public enum CallbackStatus {
 

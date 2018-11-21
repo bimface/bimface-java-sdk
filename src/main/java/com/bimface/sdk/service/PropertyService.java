@@ -1,50 +1,47 @@
 package com.bimface.sdk.service;
 
-import com.alibaba.fastjson.TypeReference;
-import com.bimface.sdk.bean.GeneralResponse;
-import com.bimface.sdk.bean.response.PropertyBean;
+import com.bimface.data.bean.Property;
+import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.client.DataClient;
 import com.bimface.sdk.config.Endpoint;
-import com.bimface.sdk.exception.BimfaceException;
-import com.bimface.sdk.http.HttpHeaders;
-import com.bimface.sdk.http.HttpUtils;
-import com.bimface.sdk.http.ServiceClient;
-import com.bimface.sdk.utils.AssertUtils;
-import com.squareup.okhttp.Response;
+
+import java.util.List;
 
 /**
  * 模型属性服务
  * 
  * @author bimface, 2016-06-01.
  */
-public class PropertyService extends AbstractAccessTokenService {
-
-    private final String PROPERTIES_URL           = getApiHost() + "/data/element/property?fileId=%s&elementId=%s";
-
-    private final String INTEGRATE_PROPERTIES_URL = getApiHost()
-                                                    + "/data/integration/element/property?integrateId=%s&fileId=%s&elementId=%s";
-
-    public PropertyService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
-        super(serviceClient, endpoint, accessTokenService);
+public class PropertyService {
+    private DataClient dataClient;
+    private AccessTokenService accessTokenService;
+    public PropertyService(Endpoint endpoint, AccessTokenService accessTokenService) {
+        dataClient = DataClient.getDataClient(endpoint.getApiHost() + "/data/");
+        this.accessTokenService = accessTokenService;
     }
 
     /**
      * 获取单文件的构件属性
-     * 
+     *
      * @param fileId 文件id
      * @param elementId 构件id
-     * @return {@link PropertyBean}
+     * @return {@link Property}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public PropertyBean getElementProperty(Long fileId, String elementId) throws BimfaceException {
+    public Property getElementProperty(Long fileId, String elementId) throws BimfaceException {
+        return dataClient.getSingleModelElementProperty(fileId, elementId, accessTokenService.getAccessToken());
+    }
 
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-        AssertUtils.assertStringNotNullOrEmpty(elementId, "elementId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(PROPERTIES_URL, fileId, elementId), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<PropertyBean>>() {});
+    /**
+     * 获取单文件的构件属性，v2
+     *
+     * @param fileId 文件id
+     * @param elementIds 构件id
+     * @return {@link Property}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public Property getSingleModelElementPropertyV2(Long fileId, List<String> elementIds) throws BimfaceException {
+        return dataClient.getSingleModelElementProperty(fileId, elementIds, accessTokenService.getAccessToken());
     }
 
     /**
@@ -53,22 +50,11 @@ public class PropertyService extends AbstractAccessTokenService {
      * @param integrateId 集成id
      * @param fileId 文件id（模型集成之前所属的单文件id）
      * @param elementId 构件id
-     * @return {@link PropertyBean}
+     * @return {@link Property}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public PropertyBean getIntegrationElementProperty(Long integrateId, Long fileId,
+    public Property getIntegrationElementProperty(Long integrateId, Long fileId,
                                                       String elementId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-        AssertUtils.assertStringNotNullOrEmpty(elementId, "elementId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(INTEGRATE_PROPERTIES_URL, integrateId, fileId,
-                                                                 elementId),
-                                                   headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<PropertyBean>>() {});
+        return dataClient.getIntegrateModelProperty(integrateId, fileId, elementId, accessTokenService.getAccessToken());
     }
 }

@@ -6,7 +6,7 @@ import com.bimface.sdk.utils.MD5Util;
 
 /**
  * 验证签名
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class SignatureService {
@@ -19,10 +19,11 @@ public class SignatureService {
 
     /**
      * 校验签名方法,针对于回调函数验证是否为bimface发起
-     * 
+     *
      * @param signature 回调时带的签名
      * @param id 可能是fileId或integrateId
      * @param status 转换状态(success || failed)
+     * @param nonce 随机数
      * @return true: 验证成功, false: 校验失败
      */
     public boolean validate(String signature, String id, String status, String nonce) {

@@ -1,37 +1,22 @@
 package com.bimface.sdk.service;
 
-import com.alibaba.fastjson.TypeReference;
-import com.bimface.sdk.bean.GeneralResponse;
-import com.bimface.sdk.bean.response.ShareLinkBean;
+import com.bimface.api.bean.compatible.response.ShareLinkBean;
+import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.client.ApiClient;
 import com.bimface.sdk.config.Endpoint;
-import com.bimface.sdk.exception.BimfaceException;
-import com.bimface.sdk.http.HttpHeaders;
-import com.bimface.sdk.http.HttpUtils;
-import com.bimface.sdk.http.ServiceClient;
-import com.bimface.sdk.utils.AssertUtils;
-import com.squareup.okhttp.Response;
 
 /**
  * 分享链接
  * 
  * @author bimface, 2016-06-01.
  */
-public class ShareLinkService extends AbstractAccessTokenService {
+public class ShareLinkService {
+    private ApiClient apiClient;
+    private AccessTokenService accessTokenService;
 
-    private final String CREATE_TRANSLATE_SHARE_URL         = getApiHost() + "/share?fileId=%s&activeHours=%s";
-
-    private final String CREATE_TRANSLATE_SHARE_URL_FOREVER = getApiHost() + "/share?fileId=%s";
-
-    private final String DELETE_TRANSLATE_SHARE_URL         = getApiHost() + "/share?fileId=%s";
-
-    private final String CREATE_INTEGRATE_SHARE_URL         = getApiHost() + "/share?integrateId=%s&activeHours=%s";
-
-    private final String CREATE_INTEGRATE_SHARE_URL_FOREVER = getApiHost() + "/share?integrateId=%s";
-
-    private final String DELETE_INTEGRATE_SHARE_URL         = getApiHost() + "/share?integrateId=%s";
-
-    public ShareLinkService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
-        super(serviceClient, endpoint, accessTokenService);
+    public ShareLinkService(Endpoint endpoint, AccessTokenService accessTokenService) {
+        this.apiClient = ApiClient.getApiClient(endpoint.getApiHost());
+        this.accessTokenService = accessTokenService;
     }
 
     /**
@@ -43,25 +28,7 @@ public class ShareLinkService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public ShareLinkBean createShare(Long fileId, Integer activeHours) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "transferId");
-        if (activeHours == null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.addOAuth2Header(getAccessToken());
-            Response response = getServiceClient().post(String.format(CREATE_TRANSLATE_SHARE_URL_FOREVER, fileId), "",
-                                                        headers);
-            return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
-        }
-        if (activeHours != null && activeHours <= 0) {
-            throw new IllegalArgumentException("activeHours must not less than zero.");
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().post(String.format(CREATE_TRANSLATE_SHARE_URL, fileId, activeHours), "",
-                                                    headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
+        return apiClient.createShare(fileId, null, activeHours, accessTokenService.getAccessToken());
     }
 
     /**
@@ -72,15 +39,7 @@ public class ShareLinkService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public ShareLinkBean createShare(Long fileId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().post(String.format(CREATE_TRANSLATE_SHARE_URL_FOREVER, fileId), "",
-                                                    headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
+        return createShare(fileId, null);
     }
 
     /**
@@ -91,14 +50,7 @@ public class ShareLinkService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public String deleteShare(Long fileId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().delete(String.format(DELETE_TRANSLATE_SHARE_URL, fileId), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<String>>() {});
+        return apiClient.deleteShare(fileId, null, accessTokenService.getAccessToken());
     }
 
     /**
@@ -110,15 +62,7 @@ public class ShareLinkService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public ShareLinkBean createShareIntegration(Long integrateId, Integer activeHours) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().post(String.format(CREATE_INTEGRATE_SHARE_URL, integrateId, activeHours),
-                                                    "", headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
+        return apiClient.createShare(null, integrateId, activeHours, accessTokenService.getAccessToken());
     }
 
     /**
@@ -129,15 +73,7 @@ public class ShareLinkService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public ShareLinkBean createShareIntegration(Long integrateId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().post(String.format(CREATE_INTEGRATE_SHARE_URL_FOREVER, integrateId), "",
-                                                    headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<ShareLinkBean>>() {});
+        return createShareIntegration(integrateId, null);
     }
 
     /**
@@ -148,13 +84,6 @@ public class ShareLinkService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public String deleteShareIntegration(Long integrateId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().delete(String.format(DELETE_INTEGRATE_SHARE_URL, integrateId), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<String>>() {});
+        return apiClient.deleteShare(null, integrateId, accessTokenService.getAccessToken());
     }
 }
