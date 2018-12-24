@@ -23,7 +23,7 @@ import java.io.InputStream;
 
 /**
  * 文件上传
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class FileService {
@@ -39,7 +39,7 @@ public class FileService {
 
     /**
      * 上传文件
-     * 
+     *
      * @param fileUploadRequest 文件上传的请求参数
      * @return {@link FileBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -49,20 +49,17 @@ public class FileService {
     }
 
     public FileBean upload(FileUploadRequest fileUploadRequest, String accessToken) throws BimfaceException {
-
         check(fileUploadRequest, accessToken);
-
         FileBean fileBean;
         if (fileUploadRequest.isByUrl()) {
             fileBean = fileClient.uploadFileByUrl(fileUploadRequest.getName(), fileUploadRequest.getSourceId(),
-                    fileUploadRequest.getUrl(), null, accessToken);
+                    fileUploadRequest.getUrl(), fileUploadRequest.getEtag(), accessToken);
         } else if (fileUploadRequest.isByOSS()) {
             fileBean = fileClient.uploadFileFromOSS(fileUploadRequest.getName(), fileUploadRequest.getSourceId(),
                     fileUploadRequest.getBucket(), fileUploadRequest.getObjectKey(), accessToken);
         } else {
             fileBean = fileClient.uploadFileStream(fileUploadRequest.getName(), fileUploadRequest.getSourceId(),
                     fileUploadRequest.getContentLength(), fileUploadRequest.getInputStream(), accessToken);
-
         }
         return fileBean;
     }
@@ -97,7 +94,7 @@ public class FileService {
 
     /**
      * 通过申请上传Policy的方式直接上传到OSS
-     * 
+     *
      * @param name 上传文件名
      * @param sourceId 上传源文件Id（非必选）
      * @param contentLength 文件长度
@@ -168,7 +165,7 @@ public class FileService {
             AssertUtils.checkFileLength(supportFileBean.getLength(), fileUploadRequest.getContentLength());
         }
     }
-    
+
     /**
      * 删除文件
      *
@@ -190,7 +187,7 @@ public class FileService {
     public AppendFileBean createAppendFile(String name, String sourceId, Long length) throws BimfaceException {
         return createAppendFile(name, sourceId, length, accessTokenService.getAccessToken());
     }
-    
+
     public AppendFileBean createAppendFile(String name, String sourceId, Long length, String accessToken) throws BimfaceException {
     	// 文件名校验
         FileNameUtils.checkFileName(name);
@@ -206,7 +203,7 @@ public class FileService {
 
         return fileClient.createAppendFile(name, sourceId, length, accessToken);
     }
-    
+
     /**
      * 查询追加文件信息
      * @param appendFileId
@@ -216,11 +213,11 @@ public class FileService {
     public AppendFileBean queryAppendFile(Long appendFileId) throws BimfaceException {
         return queryAppendFile(appendFileId, accessTokenService.getAccessToken());
     }
-    
+
     public AppendFileBean queryAppendFile(Long appendFileId, String accessToken) throws BimfaceException {
         return fileClient.getAppendFile(appendFileId, accessToken);
     }
-    
+
     /**
      * 追加上传
      * @param appendFileId
@@ -230,7 +227,7 @@ public class FileService {
     public AppendFileBean uploadAppendFile(InputStream inputStream, Long appendFileId) throws BimfaceException {
         return uploadAppendFile(inputStream, appendFileId, accessTokenService.getAccessToken());
     }
-    
+
     public AppendFileBean uploadAppendFile(InputStream inputStream, Long appendFileId, String accessToken) throws BimfaceException {
     	AppendFileBean appendFileBean = queryAppendFile(appendFileId, accessToken);
 
@@ -238,7 +235,7 @@ public class FileService {
 
         return fileClient.appendUpload(appendFileId, appendFileBean.getPosition(), body, accessToken);
     }
-    
+
     private static RequestBody requestIOFromPosition(final InputStream inputStream, final AppendFileBean appendFileBean) {
     	if (inputStream == null) throw new NullPointerException("content == null");
 
@@ -258,7 +255,7 @@ public class FileService {
             public void writeTo(BufferedSink sink) throws IOException {
                 try {
                 	inputStream.skip(appendFileBean.getPosition());
-                	
+
                     final byte[] buffer = new byte[BimfaceConstants.PUT_THRESHOLD];
                     int l;
                     while ((l = inputStream.read(buffer)) != -1) {
@@ -270,10 +267,10 @@ public class FileService {
             }
         };
     }
-    
+
     /**
      * 根据文件id获取文件元信息
-     * 
+     *
      * @param fileId 文件Id
      * @return {@link FileBean}
      * @throws BimfaceException {@link BimfaceException}

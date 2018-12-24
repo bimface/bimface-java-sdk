@@ -1,10 +1,12 @@
 package com.bimface.sdk.utils;
 
+import com.bimface.sdk.constants.BimfaceConstants;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
-
-import com.bimface.sdk.constants.BimfaceConstants;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 参数校验
@@ -99,5 +101,16 @@ public class AssertUtils {
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             throw new IllegalArgumentException("Url must starts with http(s)://.");
         }
+    }
+
+    public static Boolean isEffectiveDate(String date) {
+        if (date == null || date.trim().length() == 0) {
+            return false;
+        }
+        String regex = "^((\\d{2}(([02468][048])|([13579][26]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d{2}(([02468][1235679])|([13579][01345789]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(date);
+        boolean dateFlag = m.matches();
+        return dateFlag;
     }
 }

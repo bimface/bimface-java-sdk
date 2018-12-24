@@ -5,7 +5,6 @@ import com.bimface.data.bean.*;
 import com.bimface.exception.BimfaceException;
 import com.bimface.sdk.client.DataClient;
 import com.bimface.sdk.config.Endpoint;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class ElementService  {
 
     /**
      * 按查询条件查询构件ID组
-     * 
+     *
      * @param fileId 文件id
      * @param floor 楼层
      * @param specialty 专业
@@ -41,7 +40,7 @@ public class ElementService  {
 
     /**
      * 按查询条件获取集成模型的构件列表
-     * 
+     *
      * @param integrateId 集成id
      * @param floor 楼层
      * @param specialty 专业

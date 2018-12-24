@@ -64,6 +64,15 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getDatabagDownloadUrl(fileId, integrateId, compareId, type, databagVersion, accessToken));
     }
 
+    public Long getDatabagSize(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        DatabagInfo databagInfo = executeCall(dataClient.getDataBagSize(fileId, accessToken));
+        if (databagInfo != null) {
+            return databagInfo.getLength();
+        }
+        throw new BimfaceException("find databagInfo error");
+    }
+
     public List<String> getSingleModelElements(@NotNull Long fileId, String specialty, String floor, String categoryId,
                                                String family, String familyType, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
@@ -473,5 +482,15 @@ public class DataClient extends AbstractClient {
     public String getDwgPreviewImageUrl(@NotNull Long dwgFileId, @NotNull String layoutName, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(dataClient.getDwgPreviewImageUrl(dwgFileId, layoutName, accessToken));
+    }
+
+    public String getFileDatabagRootUrl(Long fileId, String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getFileDatabagRootUrl(fileId, accessToken));
+    }
+
+    public String getIntegrateDatabagRootUrl(Long integrateId, String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getIntegrateDatabagRootUrl(integrateId, accessToken));
     }
 }

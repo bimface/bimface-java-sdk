@@ -23,6 +23,9 @@ public interface DataInteface {
                                                      @Query("compareId") Long compareId, @Query("type") String type,
                                                      @Query("databagVersion") String databagVersion, @Header("Authorization") String accessToken);
 
+    @GET("databag/length")
+    Call<RESTResponse<DatabagInfo>> getDataBagSize(@Query("fileId") Long fileId, @Header("Authorization") String accessToken);
+
     @GET("element/id")
     Call<RESTResponse<List<String>>> getSingleModelElements(@Query("fileId") Long fileId, @Query("specialty") String specialty,
                                                             @Query("floor") String floor, @Query("categoryId") String categoryId,
@@ -319,4 +322,10 @@ public interface DataInteface {
 
     @GET("v2/databag/previewImage")
     Call<RESTResponse<String>> getDwgPreviewImageUrl(@Query("dwgFileId") Long dwgFileId, @Query("layoutName") String layoutName, @Header("Authorization") String accessToken);
+
+    @GET("v2/databag/rootUrl")
+    Call<RESTResponse<String>> getFileDatabagRootUrl(@Query("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @GET("v2/databag/rootUrl")
+    Call<RESTResponse<String>> getIntegrateDatabagRootUrl(@Query("integrateId") Long integrateId, @Header("Authorization") String accessToken);
 }

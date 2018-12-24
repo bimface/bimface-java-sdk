@@ -22,7 +22,7 @@ public class OfflineDatabagService {
 
     public OfflineDatabagService(Endpoint endpoint, AccessTokenService accessTokenService) {
         this.apiClient = ApiClient.getApiClient(endpoint.getApiHost());
-        this.dataClient = DataClient.getDataClient(endpoint.getFileHost() + "/data/");
+        this.dataClient = DataClient.getDataClient(endpoint.getApiHost() + "/data/");
         this.accessTokenService = accessTokenService;
     }
 
