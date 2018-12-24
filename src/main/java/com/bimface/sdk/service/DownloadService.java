@@ -1,58 +1,62 @@
 package com.bimface.sdk.service;
 
-import java.io.InputStream;
 
-import com.alibaba.fastjson.TypeReference;
-import com.bimface.sdk.bean.GeneralResponse;
+import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.client.FileClient;
 import com.bimface.sdk.config.Endpoint;
-import com.bimface.sdk.exception.BimfaceException;
-import com.bimface.sdk.http.HttpHeaders;
-import com.bimface.sdk.http.HttpUtils;
-import com.bimface.sdk.http.ServiceClient;
-import com.bimface.sdk.utils.AssertUtils;
-import com.squareup.okhttp.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * 文件下载
  * 
  * @author bimface, 2016-11-01.
  */
-public class DownloadService extends AbstractAccessTokenService {
+public class DownloadService  {
+    private final static Logger logger = LoggerFactory.getLogger(DownloadService.class);
+    private FileClient fileClient;
+    private AccessTokenService accessTokenService;
 
-    private final String DOWNLOAD_URL = getFileHost() + "/download/url?fileId=%s&fileName=%s";
-
-    public DownloadService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
-        super(serviceClient, endpoint, accessTokenService);
+    public DownloadService(Endpoint endpoint, AccessTokenService accessTokenService) {
+        this.fileClient = FileClient.getFileClient(endpoint.getFileHost());
+        this.accessTokenService = accessTokenService;
     }
 
     /**
      * 获取文件下载链接
      * 
+     * @param accessToken 登录后的授权凭证
      * @param fileId 文件Id
      * @return String
-     * @throws BimfaceException
+     * @throws BimfaceException {@link BimfaceException}
      */
+    public String getDownloadUrl(String accessToken, Long fileId) throws BimfaceException {
+        return getDownloadUrl(fileId, null, accessToken);
+    }
+
     public String getDownloadUrl(Long fileId) throws BimfaceException {
-        return getDownloadUrl(fileId, "");
+        return getDownloadUrl(accessTokenService.getAccessToken(), fileId);
     }
 
     /**
      * 获取文件下载链接
      * 
      * @param fileId 文件Id
+     * @param fileName 文件名
      * @return String
-     * @throws BimfaceException
+     * @throws BimfaceException {@link BimfaceException}
      */
     public String getDownloadUrl(Long fileId, String fileName) throws BimfaceException {
+        return getDownloadUrl(fileId, fileName, accessTokenService.getAccessToken());
+    }
 
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-        AssertUtils.assertParameterNotNull(fileName, "fileName");
+    public String getDownloadUrl(Long fileId, String fileName, String accessToken) throws BimfaceException {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(DOWNLOAD_URL, fileId.toString(), fileName), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<String>>() {});
+        return fileClient.getFileDownloadUrl(fileId, fileName, accessToken);
     }
 
     /**
@@ -64,14 +68,21 @@ public class DownloadService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public InputStream getFileContent(Long fileId, String name) throws BimfaceException {
-        String url = null;
+        return getFileContent(fileId, name, accessTokenService.getAccessToken());
+    }
+
+    public InputStream getFileContent(Long fileId, String name, String accessToken) throws BimfaceException {
+        String url;
         if (name == null) {
-            url = getDownloadUrl(fileId);
+            url = getDownloadUrl(accessToken, fileId);
         } else {
-            url = getDownloadUrl(fileId, name);
+            url = getDownloadUrl(fileId, name, accessToken);
         }
-        HttpHeaders headers = new HttpHeaders();
-        Response response = getServiceClient().get(url, headers);
-        return HttpUtils.response(response);
+        logger.debug("download by url[{}]", url);
+        try {
+            return new URL(url).openStream();
+        } catch (IOException e) {
+            throw new BimfaceException("download by url error, url: " + url, e);
+        }
     }
 }

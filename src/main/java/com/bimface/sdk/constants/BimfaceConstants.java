@@ -1,8 +1,8 @@
 package com.bimface.sdk.constants;
 
-import java.nio.charset.Charset;
+import okhttp3.MediaType;
 
-import com.squareup.okhttp.MediaType;
+import java.nio.charset.Charset;
 
 /**
  * 常量

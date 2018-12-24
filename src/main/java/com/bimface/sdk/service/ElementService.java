@@ -1,62 +1,42 @@
 package com.bimface.sdk.service;
 
-import java.util.List;
 
-import com.alibaba.fastjson.TypeReference;
-import com.bimface.sdk.bean.GeneralResponse;
-import com.bimface.sdk.bean.response.ElementsBean;
+import com.bimface.data.bean.*;
+import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.client.DataClient;
 import com.bimface.sdk.config.Endpoint;
-import com.bimface.sdk.exception.BimfaceException;
-import com.bimface.sdk.http.HttpHeaders;
-import com.bimface.sdk.http.HttpUtils;
-import com.bimface.sdk.http.ServiceClient;
-import com.bimface.sdk.utils.AssertUtils;
-import com.squareup.okhttp.Response;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * 查询构件ID服务
  *
  * @author bimface, 2016-11-02.
  */
-public class ElementService extends AbstractAccessTokenService {
-
-    private final String GET_ELEMENT_URL           = getApiHost() + "/data/element/id?fileId=%s";
-    private final String GET_INTEGRATE_ELEMENT_URL = getApiHost() + "/data/integration/element?integrateId=%s";
-
-    public ElementService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
-        super(serviceClient, endpoint, accessTokenService);
+public class ElementService  {
+    private DataClient dataClient;
+    private AccessTokenService accessTokenService;
+    public ElementService(Endpoint endpoint, AccessTokenService accessTokenService) {
+        this.dataClient = DataClient.getDataClient(endpoint.getApiHost() + "/data/");
+        this.accessTokenService = accessTokenService;
     }
 
     /**
      * 按查询条件查询构件ID组
      * 
      * @param fileId 文件id
+     * @param floor 楼层
+     * @param specialty 专业
      * @param categoryId 分类id
      * @param family 族
      * @param familyType 族类型
      * @return List&lt;{@link String}&gt;
      * @throws BimfaceException {@link BimfaceException}
      */
-    public List<String> getElements(Long fileId, String categoryId, String family,
+    public List<String> getElements(Long fileId, String floor, String specialty, String categoryId, String family,
                                     String familyType) throws BimfaceException {
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-
-        StringBuilder sb = new StringBuilder().append(String.format(GET_ELEMENT_URL, fileId));
-        if (categoryId != null) {
-            sb.append("&categoryId=").append(categoryId);
-        }
-        if (family != null) {
-            sb.append("&family=").append(family);
-        }
-        if (familyType != null) {
-            sb.append("&familyType=").append(familyType);
-        }
-        Response response = getServiceClient().get(sb.toString(), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<List<String>>>() {});
+        return dataClient.getSingleModelElements(fileId, specialty, floor, categoryId, family, familyType, accessTokenService.getAccessToken());
     }
 
     /**
@@ -68,35 +48,99 @@ public class ElementService extends AbstractAccessTokenService {
      * @param categoryId 分类id
      * @param family 族
      * @param familyType 族类型
-     * @return {@link ElementsBean}
+     * @return {@link ElementsWithBoundingBox}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public ElementsBean getIntegrationElements(Long integrateId, String floor, String specialty, String categoryId,
-                                               String family, String familyType) throws BimfaceException {
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
+    public ElementsWithBoundingBox getIntegrateElements(Long integrateId, String floor, String specialty, String categoryId,
+                                                          String family, String familyType) throws BimfaceException {
+        return dataClient.getIntegrateModelElements(integrateId, specialty, floor, categoryId, family, familyType, null, accessTokenService.getAccessToken());
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
+    /**
+     * 按查询条件查询构件ID 组，v2
+     *
+     * @param fileId 文件id
+     * @param categoryId
+     * @param family
+     * @param familyType
+     * @param floor
+     * @param specialty
+     * @return List&lt;{@link String}&gt;
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public List<String> getElementIdsV2(Long fileId, String specialty, String floor, String categoryId,
+                                        String family, String familyType) throws BimfaceException {
+        return dataClient.getSingleModelElementIds(fileId, specialty, floor, categoryId, family, familyType, accessTokenService.getAccessToken());
+    }
 
-        StringBuilder sb = new StringBuilder().append(String.format(GET_INTEGRATE_ELEMENT_URL, integrateId));
-        if (categoryId != null) {
-            sb.append("&categoryId=").append(categoryId);
-        }
-        if (family != null) {
-            sb.append("&family=").append(family);
-        }
-        if (familyType != null) {
-            sb.append("&familyType=").append(familyType);
-        }
-        if (floor != null) {
-            sb.append("&floor=").append(floor);
-        }
-        if (specialty != null) {
-            sb.append("&specialty=").append(specialty);
-        }
-        Response response = getServiceClient().get(sb.toString(), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<ElementsBean>>() {});
+    /**
+     * 获取单模型的单个构件，v2
+     * @param fileId
+     * @param elementId
+     * @return
+     * @throws BimfaceException
+     */
+    public Property getSingleModelElementV2(Long fileId, String elementId) throws BimfaceException {
+        return dataClient.getSingleModelElement(fileId, elementId, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 根据构件 ID 批量获取单模型的构件，v2
+     * @param fileId
+     * @param elementIds
+     * @return
+     * @throws BimfaceException
+     */
+    public List<Property> getSingleModelElementsV2(Long fileId, List<String> elementIds) throws BimfaceException {
+        return dataClient.getSingleModelElements(fileId, elementIds, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 获取单模型的构件材质，v2
+     * @param fileId
+     * @param elementId
+     * @return
+     * @throws BimfaceException
+     */
+    public List<MaterialInfo> getSingleModelMaterials(Long fileId, String elementId) throws BimfaceException {
+        return dataClient.getSingleModelElementMaterials(fileId, elementId, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 单模型获取钢筋工程量, v2
+     *
+     * @param fileId
+     * @param elementId
+     * @return
+     */
+    public List<Bar> getSingleModelElementBars(Long fileId, String elementId) throws BimfaceException {
+        return dataClient.getSingleModelElementBars(fileId, elementId, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 单模型获取构件工程量，v2
+     *
+     * @param fileId
+     * @param elementId
+     * @param type
+     * @return
+     * @throws BimfaceException
+     */
+    public List<Quantity> getSingleModelElementQuantities(Long fileId, String elementId, String type) throws BimfaceException {
+        return dataClient.getSingleModelElementQuantities(fileId, elementId, type, accessTokenService.getAccessToken());
+    }
+
+
+    /**
+     * 获取多个构件的工程量汇总，v2
+     *
+     * @param fileId
+     * @param elementIds
+     * @return
+     * @throws BimfaceException
+     */
+    public List<AggregatedQuantity> getSingleModelAggregatedElementQuantities(Long fileId, List<String> elementIds, String type) throws BimfaceException {
+        return dataClient.getSingleModelAggregatedElementQuantities(fileId, elementIds, type, accessTokenService.getAccessToken());
     }
 
 }

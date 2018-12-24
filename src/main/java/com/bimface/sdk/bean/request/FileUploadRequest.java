@@ -1,10 +1,8 @@
 package com.bimface.sdk.bean.request;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
-import com.bimface.sdk.constants.BimfaceConstants;
+import com.bimface.sdk.utils.StringUtils;
 
 /**
  * 文件上传的请求参数
@@ -18,6 +16,9 @@ public class FileUploadRequest {
     private Long        contentLength; // 文件长度
     private InputStream inputStream;   // 文件流
     private String      url;           // 文件的下载地址，如果提供了下载地址，则无需设置inputStream、contentLength
+
+    private String      bucket;        // 文件在阿里云的bucket，如果提供了bucket，则需要提供objectKey，不设置url，inputStream和contentLength
+    private String      objectKey;     // 文件在阿里云的objectKey，如果提供了objectKey，则需要提供objectKey，不设置url，inputStream和contentLength
 
     public FileUploadRequest() {
     }
@@ -35,19 +36,19 @@ public class FileUploadRequest {
         this.inputStream = inputStream;
     }
 
+    public FileUploadRequest(String name, String sourceId, String bucket, String objectKey) {
+        this.name = name;
+        this.sourceId = sourceId;
+        this.bucket = bucket;
+        this.objectKey = objectKey;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        if (name == null) {
-            return;
-        }
-        try {
-            this.name = URLEncoder.encode(name, BimfaceConstants.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            // ignore
-        }
+        this.name = name;
     }
 
     public String getSourceId() {
@@ -55,14 +56,7 @@ public class FileUploadRequest {
     }
 
     public void setSourceId(String sourceId) {
-        if (sourceId == null) {
-            return;
-        }
-        try {
-            this.sourceId = URLEncoder.encode(sourceId, BimfaceConstants.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            // ignore
-        }
+        this.sourceId = sourceId;
     }
 
     public Long getContentLength() {
@@ -78,14 +72,7 @@ public class FileUploadRequest {
     }
 
     public void setUrl(String url) {
-        if (url == null) {
-            return;
-        }
-        try {
-            this.url = URLEncoder.encode(url, BimfaceConstants.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            // ignore
-        }
+        this.url = url;
     }
 
     public InputStream getInputStream() {
@@ -96,12 +83,37 @@ public class FileUploadRequest {
         this.inputStream = inputStream;
     }
 
+    public String getBucket() {
+        return bucket;
+    }
+
+    public void setBucket(String bucket) {
+        this.bucket = bucket;
+    }
+
+    public String getObjectKey() {
+        return objectKey;
+    }
+
+    public void setObjectKey(String objectKey) {
+        this.objectKey = objectKey;
+    }
+
     /**
      * 判断是否通过URL方式上传文件
-     * 
+     *
      * @return true:是, false:否
      */
     public boolean isByUrl() {
         return (this.url != null) && (url.length() > 0);
+    }
+
+    /**
+     * 判断是否通过OSS元数据方式上传文件
+     *
+     * @return true:是, false:否
+     */
+    public boolean isByOSS() {
+        return !StringUtils.isNullOrEmpty(bucket) && (!StringUtils.isNullOrEmpty(objectKey));
     }
 }

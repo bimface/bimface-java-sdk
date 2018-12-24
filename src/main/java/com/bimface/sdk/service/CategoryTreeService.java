@@ -1,50 +1,53 @@
 package com.bimface.sdk.service;
 
-import java.util.List;
-
-import com.alibaba.fastjson.TypeReference;
-import com.bimface.sdk.bean.GeneralResponse;
-import com.bimface.sdk.bean.response.CategoryBean;
-import com.bimface.sdk.bean.response.FloorTree;
-import com.bimface.sdk.bean.response.SpecialtyTree;
+import com.bimface.data.bean.Category;
+import com.bimface.data.bean.FloorTree;
+import com.bimface.data.bean.SpecialtyTree;
+import com.bimface.data.bean.Tree;
+import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.client.DataClient;
 import com.bimface.sdk.config.Endpoint;
-import com.bimface.sdk.exception.BimfaceException;
-import com.bimface.sdk.http.HttpHeaders;
-import com.bimface.sdk.http.HttpUtils;
-import com.bimface.sdk.http.ServiceClient;
-import com.bimface.sdk.utils.AssertUtils;
-import com.squareup.okhttp.Response;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.List;
 
 /**
  * 构件分类树服务
  *
  * @author bimface, 2016-11-01.
  */
-public class CategoryTreeService extends AbstractAccessTokenService {
-
-    private final String GET_CATEGORY_URL = getApiHost() + "/data/hierarchy?fileId=%s";
-    private final String GET_TREE_URL     = getApiHost() + "/data/integration/tree?integrateId=%s&treeType=%s";
-
-    public CategoryTreeService(ServiceClient serviceClient, Endpoint endpoint, AccessTokenService accessTokenService) {
-        super(serviceClient, endpoint, accessTokenService);
+public class CategoryTreeService {
+    private DataClient dataClient;
+    private AccessTokenService accessTokenService;
+    private final static Gson GSON = new Gson();
+    public CategoryTreeService(Endpoint endpoint, AccessTokenService accessTokenService) {
+        this.dataClient = DataClient.getDataClient(endpoint.getApiHost() + "/data/");
+        this.accessTokenService = accessTokenService;
     }
 
     /**
      * 获取构件分类树
-     * 
+     *
      * @param fileId 文件Id
-     * @return {@link CategoryBean}
+     * @return {@link Tree.TreeNode}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public List<CategoryBean> getCategoryTree(Long fileId) throws BimfaceException {
+    public List<Category> getCategoryTree(Long fileId) throws BimfaceException {
+        Object object = dataClient.getSingleModelTree(fileId, "1.0", accessTokenService.getAccessToken());
+        return GSON.fromJson(GSON.toJson(object), new TypeToken<List<Category>>(){}.getType());
+    }
 
-        // 参数校验
-        AssertUtils.assertParameterNotNull(fileId, "fileId");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(GET_CATEGORY_URL, fileId), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<List<CategoryBean>>>() {});
+    /**
+     * 获取构件分类树V2
+     * 
+     * @param fileId 文件Id
+     * @return {@link Tree.TreeNode}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public List<Tree.TreeNode> getCategoryTreeV2(Long fileId) throws BimfaceException {
+        Object object = dataClient.getSingleModelTree(fileId, "2.0", accessTokenService.getAccessToken());
+        return GSON.fromJson(GSON.toJson(object), new TypeToken<List<Tree.TreeNode>>(){}.getType());
     }
 
     /**
@@ -55,15 +58,8 @@ public class CategoryTreeService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public FloorTree getFloorTree(Long integrateId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
-        Integer treeType = 2;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(GET_TREE_URL, integrateId, treeType), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<FloorTree>>() {});
+        Object object = dataClient.getIntegrateTree(integrateId, 2, accessTokenService.getAccessToken());
+        return GSON.fromJson(GSON.toJson(object), FloorTree.class);
     }
 
     /**
@@ -74,15 +70,7 @@ public class CategoryTreeService extends AbstractAccessTokenService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public SpecialtyTree getSpecialtyTree(Long integrateId) throws BimfaceException {
-
-        // 参数校验
-        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
-        Integer treeType = 1;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.addOAuth2Header(getAccessToken());
-        Response response = getServiceClient().get(String.format(GET_TREE_URL, integrateId, treeType), headers);
-        return HttpUtils.response(response, new TypeReference<GeneralResponse<SpecialtyTree>>() {});
+        Object object = dataClient.getIntegrateTree(integrateId, 1, accessTokenService.getAccessToken());
+        return GSON.fromJson(GSON.toJson(object), SpecialtyTree.class);
     }
-
 }

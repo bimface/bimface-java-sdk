@@ -12,7 +12,7 @@ public class FileNameUtils {
     /**
      * 检查文件名称
      * 
-     * @param name
+     * @param name 文件名
      */
     public static void checkFileName(String name) {
         if (name == null || name.length() <= 0) {
@@ -33,8 +33,8 @@ public class FileNameUtils {
     /**
      * 检查后缀名是否支持
      * 
-     * @param allSupportedType
-     * @param name
+     * @param allSupportedType 支持的文件格式
+     * @param name 文件名
      */
     public static void checkFileType(String[] allSupportedType, String name) {
         String suffix = getSuffix(name);
@@ -49,8 +49,8 @@ public class FileNameUtils {
     /**
      * 获取文件后缀名
      * 
-     * @param name
-     * @return
+     * @param name 文件名
+     * @return 文件后缀名
      */
     private static String getSuffix(String name) {
         if (name.indexOf(".") == -1) {
@@ -66,8 +66,8 @@ public class FileNameUtils {
     /**
      * 判断是否包含非法字符
      * 
-     * @param value
-     * @return
+     * @param value 值
+     * @return 是否包含非法字符
      */
     private static boolean containsIllegalChar(String value) {
         for (String x : ILLEGAL_CHAR) {
