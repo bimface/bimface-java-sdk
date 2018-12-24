@@ -6,7 +6,6 @@ import com.bimface.file.bean.SupportFileBean;
 import com.bimface.file.bean.UploadPolicyBean;
 import com.glodon.paas.foundation.restclient.RESTResponse;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -14,7 +13,6 @@ public interface FileInterface {
     @PUT("upload")
     Call<RESTResponse<FileBean>> uploadFileStream(@Query("name") String fileName, @Query("sourceId") String sourceId,
                                                   @Header("Content-Length") Long fileLength, @Body RequestBody body,
-                                                  @Url
                                                   @Header("Authorization") String accessToken);
 
     @PUT("upload")

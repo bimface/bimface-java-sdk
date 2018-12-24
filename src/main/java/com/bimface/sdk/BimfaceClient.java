@@ -54,6 +54,7 @@ public class BimfaceClient {
     private FloorService floorService;
     private SignatureService signatureService;
     private DataService dataService;
+    private DatabagService databagService;
 
     /**
      * 构造BimfaceClient对象
@@ -145,6 +146,7 @@ public class BimfaceClient {
         floorService = new FloorService(this.endpoint, accessTokenService);
         signatureService = new SignatureService(credential);
         dataService = new DataService(this.endpoint, accessTokenService);
+        databagService = new DatabagService(this.endpoint, accessTokenService);
     }
 
     /**
@@ -518,8 +520,20 @@ public class BimfaceClient {
      * @return {@link ShareLinkBean}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public ShareLinkBean createShare(Long fileId, Integer activeHours) throws BimfaceException {
+    public ShareLinkBean createTranslateShare(Long fileId, Integer activeHours) throws BimfaceException {
         return shareLinkService.createShare(fileId, activeHours);
+    }
+
+    /**
+     * 创建单个文件浏览分享链接,带分享密码
+     * @param fileId
+     * @param expireDate
+     * @param needPassword
+     * @return
+     * @throws BimfaceException
+     */
+    public ShareLinkBean createTranslateShare(Long fileId, String expireDate, Boolean needPassword) throws BimfaceException {
+        return shareLinkService.createShare(fileId, expireDate, needPassword);
     }
 
     /**
@@ -529,7 +543,7 @@ public class BimfaceClient {
      * @return {@link ShareLinkBean}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public ShareLinkBean createShare(Long fileId) throws BimfaceException {
+    public ShareLinkBean createTranslateShare(Long fileId) throws BimfaceException {
         return shareLinkService.createShare(fileId);
     }
 
@@ -539,7 +553,7 @@ public class BimfaceClient {
      * @param fileId 文件id
      * @throws BimfaceException {@link BimfaceException}
      */
-    public void deleteShare(Long fileId) throws BimfaceException {
+    public void deleteTranslateShare(Long fileId) throws BimfaceException {
         shareLinkService.deleteShare(fileId);
     }
 
@@ -551,8 +565,20 @@ public class BimfaceClient {
      * @return {@link ShareLinkBean}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public ShareLinkBean createShareIntegration(Long integrateId, Integer activeHours) throws BimfaceException {
-        return shareLinkService.createShareIntegration(integrateId, activeHours);
+    public ShareLinkBean createIntegrateShare(Long integrateId, Integer activeHours) throws BimfaceException {
+        return shareLinkService.createIntegrateShare(integrateId, activeHours);
+    }
+
+    /**
+     * 创建集成文件浏览分享链接,带分享密码
+     * @param integrateId
+     * @param expireDate
+     * @param needPassword
+     * @return
+     * @throws BimfaceException
+     */
+    public ShareLinkBean createIntegrateShare(Long integrateId, String expireDate, Boolean needPassword) throws BimfaceException {
+        return shareLinkService.createIntegrateShare(integrateId, expireDate, needPassword);
     }
 
     /**
@@ -562,8 +588,8 @@ public class BimfaceClient {
      * @return {@link ShareLinkBean}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public ShareLinkBean createShareIntegration(Long integrateId) throws BimfaceException {
-        return shareLinkService.createShareIntegration(integrateId);
+    public ShareLinkBean createIntegrateShare(Long integrateId) throws BimfaceException {
+        return shareLinkService.createIntegrateShare(integrateId);
     }
 
     /**
@@ -572,8 +598,56 @@ public class BimfaceClient {
      * @param integrateId 集成id
      * @throws BimfaceException {@link BimfaceException}
      */
-    public void deleteShareIntegration(Long integrateId) throws BimfaceException {
-        shareLinkService.deleteShareIntegration(integrateId);
+    public void deleteIntegrateShare(Long integrateId) throws BimfaceException {
+        shareLinkService.deleteIntegrateShare(integrateId);
+    }
+
+    /**
+     * 批量删除分享链接
+     * @param sourceIds
+     * @throws BimfaceException
+     */
+    public void batchDeteleShare(List<Long> sourceIds) throws BimfaceException {
+        shareLinkService.batchDeteleShare(sourceIds);
+    }
+
+    /**
+     * 获取分享链接信息
+     * @param token
+     * @return
+     * @throws BimfaceException
+     */
+    public ShareLinkBean getShareLink(String token) throws BimfaceException {
+        return shareLinkService.getShareLink(token);
+    }
+
+    /**
+     * 获取分享链接信息
+     * @param fileId
+     * @return
+     * @throws BimfaceException
+     */
+    public ShareLinkBean getTranslateShare(Long fileId) throws BimfaceException {
+        return shareLinkService.getTranslateShare(fileId);
+    }
+
+    /**
+     * 获取分享链接信息
+     * @param integrateId
+     * @return
+     * @throws BimfaceException
+     */
+    public ShareLinkBean getIntegrateShare(Long integrateId) throws BimfaceException {
+        return shareLinkService.getIntegrateShare(integrateId);
+    }
+
+    /**
+     * 获取分享列表
+     * @return
+     * @throws BimfaceException
+     */
+    public List<ShareLinkBean> shares() throws BimfaceException {
+        return shareLinkService.shareList();
     }
 
     /**
@@ -1639,4 +1713,45 @@ public class BimfaceClient {
     public String getDwgPreviewImageUrl(Long dwgFileId, String layoutName) throws BimfaceException {
         return dataService.getDwgPreviewImageUrl(dwgFileId, layoutName);
     }
+
+    /**
+     * 获取文件的数据包根URL
+     * @param fileId
+     * @return
+     * @throws BimfaceException
+     */
+    public String getFileDataBagRootUrl(Long fileId) throws BimfaceException{
+        return databagService.getFileDataBagRootUrl(fileId);
+    }
+
+    /**
+     * 获取集成数据包的根Url
+     * @param integrateId
+     * @return
+     * @throws BimfaceException
+     */
+    public String getIntegrateDatabagRootUrl(Long integrateId) throws BimfaceException{
+        return databagService.getIntegrateDatabagRootUrl(integrateId);
+    }
+
+    /**
+     * 获取数据包下载流
+     * @param fileId
+     * @return
+     * @throws BimfaceException
+     */
+    public InputStream getFileDatabagContent(Long fileId) throws BimfaceException{
+        return databagService.getFileDatabagContent(fileId);
+    }
+
+    /**
+     * 获取数据包大小
+     * @param fileId
+     * @return
+     * @throws BimfaceException
+     */
+    public Long getFileDatabagSize(Long fileId) throws BimfaceException {
+        return databagService.getFileDatabagSize(fileId);
+    }
+
 }

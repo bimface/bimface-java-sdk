@@ -16,6 +16,7 @@ public class FileUploadRequest {
     private Long        contentLength; // 文件长度
     private InputStream inputStream;   // 文件流
     private String      url;           // 文件的下载地址，如果提供了下载地址，则无需设置inputStream、contentLength
+    private String      etag;          // 文件的etag，验证文件是否已存在
 
     private String      bucket;        // 文件在阿里云的bucket，如果提供了bucket，则需要提供objectKey，不设置url，inputStream和contentLength
     private String      objectKey;     // 文件在阿里云的objectKey，如果提供了objectKey，则需要提供objectKey，不设置url，inputStream和contentLength
@@ -97,6 +98,14 @@ public class FileUploadRequest {
 
     public void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
+    }
+
+    public String getEtag() {
+        return etag;
+    }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
     }
 
     /**

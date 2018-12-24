@@ -32,10 +32,21 @@ public interface ApiInterface {
 
     @POST("share")
     Call<RESTResponse<ShareLinkBean>> createShare(@Query("fileId") Long fileId, @Query("integrateId") Long integrateId,
-                                                  @Query("activeHours") Integer activeDurationInHours, @Header("Authorization") String accessToken);
+                                                  @Query("activeHours") Integer activeDurationInHours, @Query("expireDate") String expireDate,
+                                                  @Query("needPassword") Boolean needPassword, @Header("Authorization") String accessToken);
 
     @DELETE("share")
     Call<RESTResponse<String>> deleteShare(@Query("fileId") Long fileId, @Query("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+
+    @DELETE("shares")
+    Call<RESTResponse<String>> batchDeteleShare(@Query("sourceIds") List<Long> sourceIds, @Header("Authorization") String accessToken);
+
+    @GET("share")
+    Call<RESTResponse<ShareLinkBean>> getShareLink(@Query("token") String token, @Query("fileId") Long fileId, @Query("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+
+    @GET("shares")
+    Call<RESTResponse<List<ShareLinkBean>>> shareList(@Header("Authorization") String accessToken);
+
 
     @PUT("files/{fileId}/offlineDatabag")
     Call<RESTResponse<TranslateDatabagDerivativeBean>> createTranslateOfflineDatabag(@Path("fileId") Long fileId, @Query("callback") String callback,

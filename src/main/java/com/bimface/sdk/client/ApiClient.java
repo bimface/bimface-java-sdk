@@ -7,7 +7,6 @@ import com.bimface.api.bean.request.translate.FileTranslateRequest;
 import com.bimface.api.bean.response.FileIntegrateBean;
 import com.bimface.api.bean.response.FileTranslateBean;
 import com.bimface.api.bean.response.ModelCompareBean;
-import com.bimface.api.bean.response.databagDerivative.DatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.IntegrateDatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.ModelCompareDatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.TranslateDatabagDerivativeBean;
@@ -16,6 +15,8 @@ import com.bimface.http.BimfaceResponseChecker;
 import com.bimface.sdk.bean.response.AccessTokenBean;
 import com.bimface.sdk.config.authorization.Credential;
 import com.bimface.sdk.interfaces.ApiInterface;
+import com.bimface.sdk.utils.AssertUtils;
+import com.bimface.sdk.utils.StringUtils;
 import com.glodon.paas.foundation.restclient.RESTClientBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -74,8 +75,7 @@ public class ApiClient extends AbstractClient {
         return executeCall(apiClient.getTranslation(fileId, accessToken));
     }
 
-    public ShareLinkBean createShare(Long fileId, Long integrateId,
-                                     Integer activeDurationInHours, @NotNull String accessToken) throws BimfaceException {
+    public ShareLinkBean createShare(Long fileId, Long integrateId, Integer activeDurationInHours, String expireDate, Boolean needPassword, @NotNull String accessToken) throws BimfaceException {
         if ((fileId == null && integrateId == null) ||
                 (fileId != null && integrateId != null)) {
             throw new IllegalArgumentException("one and only one argument can be not null in (fileId, integrateId)");
@@ -83,8 +83,11 @@ public class ApiClient extends AbstractClient {
         if (activeDurationInHours != null && activeDurationInHours < 0) {
             throw new IllegalArgumentException("activeDurationInHours can not be negative");
         }
+        if(!StringUtils.isNullOrEmpty(expireDate) && !AssertUtils.isEffectiveDate(expireDate)){
+            throw new IllegalArgumentException("expireDate is not effective data");
+        }
         accessToken = validToken(accessToken);
-        return executeCall(apiClient.createShare(fileId, integrateId, activeDurationInHours, accessToken));
+        return executeCall(apiClient.createShare(fileId, integrateId, activeDurationInHours, expireDate, needPassword, accessToken));
 
     }
 
@@ -95,6 +98,21 @@ public class ApiClient extends AbstractClient {
         }
         accessToken = validToken(accessToken);
         return executeCall(apiClient.deleteShare(fileId, integrateId, accessToken));
+    }
+
+    public String batchDeteleShare(List<Long> sourceIds, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.batchDeteleShare(sourceIds, accessToken));
+    }
+
+    public ShareLinkBean getShareLink(String token, Long fileId, Long integrateId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getShareLink(token, fileId, integrateId, accessToken));
+    }
+
+    public List<ShareLinkBean> shareList(@NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.shareList(accessToken));
     }
 
     public TranslateDatabagDerivativeBean createTranslateOfflineDatabag(@NotNull Long fileId, String callback, @NotNull String accessToken) throws BimfaceException {
