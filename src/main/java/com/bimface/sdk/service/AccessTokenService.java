@@ -27,10 +27,19 @@ public class AccessTokenService {
     public AccessTokenBean getAccessTokenBean() throws BimfaceException {
         AccessTokenBean accessTokenBean = accessTokenStorage.get();
         if (accessTokenBean == null) {
-            accessTokenBean = grantAccessTokenBean();
-            accessTokenStorage.put(accessTokenBean);
+            synchronized (this) {
+                if (accessTokenBean == null) {
+                    accessTokenBean = grantAccessTokenBean();
+                    accessTokenStorage.put(accessTokenBean);
+                }
+            }
         }
         return accessTokenBean;
+    }
+
+    public synchronized void updateAccessTokenBean() throws BimfaceException {
+        AccessTokenBean accessTokenBean = grantAccessTokenBean();
+        accessTokenStorage.put(accessTokenBean);
     }
 
     public String getAccessToken() throws BimfaceException {
