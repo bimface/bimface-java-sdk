@@ -25,20 +25,28 @@ public class FloorService {
      * @return 楼层信息映射列表 fileId、floors
      * @throws BimfaceException
      */
-    public List<Floor> getFileFloors(Long fileId) throws BimfaceException {
+    public List<Floor> getFileFloors(Long fileId, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
 
-        return dataClient.getSingleModelFloors(fileId, accessTokenService.getAccessToken());
+        return dataClient.getSingleModelFloors(fileId, includeArea, includeRoom, accessTokenService.getAccessToken());
     }
 
     /**
-     * 获取集成模型楼层信息
      *
      * @param integrateId   模型集成ID
      * @return 楼层信息
      * @throws BimfaceException
      */
-    public List<Floor> getIntegrateFloors(Long integrateId) throws BimfaceException {
-        return dataClient.getIntegrateModelFloors(integrateId, accessTokenService.getAccessToken());
+    /**
+     * 获取集成模型楼层信息
+     *
+     * @param integrateId 模型集成ID
+     * @param includeArea 是否将楼层中的空间ID、名称一起返回
+     * @param includeRoom 是否将楼层中的房间ID、名称一起返回
+     * @return
+     * @throws BimfaceException
+     */
+    public List<Floor> getIntegrateFloors(Long integrateId, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
+        return dataClient.getIntegrateModelFloors(integrateId, includeArea, includeRoom, accessTokenService.getAccessToken());
     }
 
     /**
@@ -49,7 +57,7 @@ public class FloorService {
      * @return
      * @throws BimfaceException
      */
-    public Map<String, Object> getSingleModelFileIdFloorsMapping(List<String> fileIds, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
+    public List<Map<String, Object>> getSingleModelFileIdFloorsMapping(List<String> fileIds, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
         return dataClient.getSingleModelFileIdFloorsMapping(fileIds, includeArea, includeRoom, accessTokenService.getAccessToken());
     }
 }

@@ -1,22 +1,26 @@
 package com.bimface.sdk;
 
+import com.bimface.api.bean.compatible.response.BatchDeleteResultBean;
 import com.bimface.api.bean.compatible.response.ShareLinkBean;
 import com.bimface.api.bean.request.integrate.FileIntegrateRequest;
+import com.bimface.api.bean.request.integrate.IntegrateQueryRequest;
+import com.bimface.api.bean.request.modelCompare.CompareRequest;
+import com.bimface.api.bean.request.modelCompare.ModelCompareQueryRequest;
 import com.bimface.api.bean.request.modelCompare.ModelCompareRequest;
 import com.bimface.api.bean.request.translate.FileTranslateRequest;
+import com.bimface.api.bean.request.translate.TranslateQueryRequest;
 import com.bimface.api.bean.request.translate.TranslateSource;
-import com.bimface.api.bean.response.FileIntegrateBean;
-import com.bimface.api.bean.response.FileTranslateBean;
-import com.bimface.api.bean.response.ModelCompareBean;
+import com.bimface.api.bean.response.*;
 import com.bimface.api.bean.response.databagDerivative.DatabagDerivativeBean;
 import com.bimface.data.bean.*;
+import com.bimface.data.enums.ToleranceType;
 import com.bimface.exception.BimfaceException;
-import com.bimface.file.bean.AppendFileBean;
-import com.bimface.file.bean.FileBean;
-import com.bimface.file.bean.SupportFileBean;
-import com.bimface.file.bean.UploadPolicyBean;
+import com.bimface.file.bean.*;
+import com.bimface.page.PagedList;
+import com.bimface.sdk.bean.request.FileBatchQueryRequest;
 import com.bimface.sdk.bean.request.FileUploadRequest;
 import com.bimface.sdk.bean.request.OfflineDatabagRequest;
+import com.bimface.sdk.bean.request.QueryElementIdsRequest;
 import com.bimface.sdk.bean.request.compare.CompareElementRequest;
 import com.bimface.sdk.config.Config;
 import com.bimface.sdk.config.Endpoint;
@@ -225,13 +229,50 @@ public class BimfaceClient {
 
     /**
      * 根据文件id获取文件元信息
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getFile(java.lang.Long)
+     *
+     * @param fileId 文件Id
+     * @return {@link FileBean}
+     * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
+     */
+    @Deprecated
+    public FileBean getFileMetadata(Long fileId) throws BimfaceException {
+        return fileService.getFileMetadata(fileId);
+    }
+
+    /**
+     * 根据文件id获取文件元信息
      *
      * @param fileId 文件Id
      * @return {@link FileBean}
      * @throws BimfaceException {@link BimfaceException}
      */
-    public FileBean getFileMetadata(Long fileId) throws BimfaceException {
-        return fileService.getFileMetadata(fileId);
+    public FileBean getFile(Long fileId) throws BimfaceException {
+        return fileService.getFile(fileId);
+    }
+
+    /**
+     * 批量查询文件元信息
+     *
+     * @param request
+     * @return
+     * @throws BimfaceException
+     */
+    public List<FileBean> getFiles(FileBatchQueryRequest request) throws BimfaceException {
+        return fileService.getFiles(request);
+    }
+
+    /**
+     * 根据文件id获取文件上传状态信息
+     *
+     * @param fileId 文件Id
+     * @return {@link FileBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public FileUploadStatusBean getFileUploadStatus(Long fileId) throws BimfaceException {
+        return fileService.getFileUploadStatus(fileId);
     }
 
     /**
@@ -333,6 +374,9 @@ public class BimfaceClient {
 
     /**
      * 通过条件查询构件ID组
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getElementIdsV2(java.lang.Long, java.lang.String, java.lang.String,
+     * java.lang.String, java.lang.String, java.lang.String)
      *
      * @param fileId     文件ID
      * @param categoryId 构件类型ID
@@ -340,6 +384,7 @@ public class BimfaceClient {
      * @param familyType 族类型
      * @return List&lt;{@link String}&gt; 构件id列表
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
     @Deprecated
     public List<String> getElements(Long fileId, String categoryId, String family,
@@ -349,6 +394,9 @@ public class BimfaceClient {
 
     /**
      * 通过条件查询构件ID组
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getElementIdsV2(java.lang.Long, java.lang.String, java.lang.String,
+     * java.lang.String, java.lang.String, java.lang.String)
      *
      * @param fileId     文件ID
      * @param floor      楼层
@@ -358,7 +406,9 @@ public class BimfaceClient {
      * @param familyType 族类型
      * @return List&lt;{@link String}&gt; 构件id列表
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public List<String> getElements(Long fileId, String floor, String specialty, String categoryId, String family,
                                     String familyType) throws BimfaceException {
         return elementService.getElements(fileId, floor, specialty, categoryId, family, familyType);
@@ -366,6 +416,9 @@ public class BimfaceClient {
 
     /**
      * 获取集成模型的构件列表
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getIntegrateModelElementIds(java.lang.Long, java.lang.String, java.lang.String,
+     * java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      *
      * @param integrateId 集成id
      * @param floor       楼层
@@ -375,7 +428,9 @@ public class BimfaceClient {
      * @param familyType  族类型
      * @return {@link ElementsWithBoundingBox}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public ElementsWithBoundingBox getIntegrateElements(Long integrateId, String floor, String specialty, String categoryId,
                                                         String family, String familyType) throws BimfaceException {
         return elementService.getIntegrateElements(integrateId, floor, specialty, categoryId, family, familyType);
@@ -436,14 +491,39 @@ public class BimfaceClient {
     }
 
     /**
+     * 批量获取文件转换状态
+     *
+     * @param translateQueryRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public PagedList<FileTranslateDetailBean> getTranslates(TranslateQueryRequest translateQueryRequest) throws BimfaceException {
+        return translateService.getTranslates(translateQueryRequest);
+    }
+
+    /**
      * 发起模型对比
+     * 已过期，推荐使用：com.bimface.sdk.BimfaceClient#compareV2(com.bimface.api.bean.request.modelCompare.CompareRequest)
      *
      * @param modelCompareRequest {@link ModelCompareBean}
      * @return {@link FileTranslateBean}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public ModelCompareBean compare(ModelCompareRequest modelCompareRequest) throws BimfaceException {
         return compareService.compare(modelCompareRequest);
+    }
+
+    /**
+     * 发起模型对比，V2
+     *
+     * @param compareRequest {@link ModelCompareBean}
+     * @return {@link FileTranslateBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public ModelCompareBean compareV2(CompareRequest compareRequest) throws BimfaceException {
+        return compareService.compareV2(compareRequest);
     }
 
     /**
@@ -455,6 +535,28 @@ public class BimfaceClient {
      */
     public ModelCompareBean getCompareInfo(Long compareId) throws BimfaceException {
         return compareService.getCompareInfo(compareId);
+    }
+
+    /**
+     * 批量获取模型对比状态
+     *
+     * @param modelCompareQueryRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public PagedList<ModelCompareBean> getCompares(ModelCompareQueryRequest modelCompareQueryRequest) throws BimfaceException {
+        return compareService.getCompares(modelCompareQueryRequest);
+    }
+
+    /**
+     * 删除模型对比
+     *
+     * @param compareId 模型对比id
+     * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
+     */
+    public void deleteCompare(Long compareId) throws BimfaceException {
+        compareService.deleteCompare(compareId);
     }
 
     /**
@@ -470,11 +572,16 @@ public class BimfaceClient {
 
     /**
      * 获取模型对比构件差异
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getModelCompareElementChange(java.lang.Long, java.lang.Long, java.lang.String,
+     * java.lang.Long, java.lang.String)
      *
      * @param compareElementRequest {@link CompareElementRequest}
      * @return {@link ModelCompareChange}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public ModelCompareChange getCompareElementDiff(CompareElementRequest compareElementRequest) throws BimfaceException {
         return compareService.getCompareElementDiff(compareElementRequest);
     }
@@ -526,6 +633,7 @@ public class BimfaceClient {
 
     /**
      * 创建单个文件浏览分享链接,带分享密码
+     *
      * @param fileId
      * @param expireDate
      * @param needPassword
@@ -571,6 +679,7 @@ public class BimfaceClient {
 
     /**
      * 创建集成文件浏览分享链接,带分享密码
+     *
      * @param integrateId
      * @param expireDate
      * @param needPassword
@@ -604,15 +713,17 @@ public class BimfaceClient {
 
     /**
      * 批量删除分享链接
+     *
      * @param sourceIds
      * @throws BimfaceException
      */
-    public void batchDeteleShare(List<Long> sourceIds) throws BimfaceException {
-        shareLinkService.batchDeteleShare(sourceIds);
+    public BatchDeleteResultBean<Long> batchDeteleShare(List<Long> sourceIds) throws BimfaceException {
+        return shareLinkService.batchDeteleShare(sourceIds);
     }
 
     /**
      * 获取分享链接信息
+     *
      * @param token
      * @return
      * @throws BimfaceException
@@ -623,6 +734,7 @@ public class BimfaceClient {
 
     /**
      * 获取分享链接信息
+     *
      * @param fileId
      * @return
      * @throws BimfaceException
@@ -633,6 +745,7 @@ public class BimfaceClient {
 
     /**
      * 获取分享链接信息
+     *
      * @param integrateId
      * @return
      * @throws BimfaceException
@@ -643,34 +756,42 @@ public class BimfaceClient {
 
     /**
      * 获取分享列表
+     *
      * @return
      * @throws BimfaceException
      */
-    public List<ShareLinkBean> shares() throws BimfaceException {
-        return shareLinkService.shareList();
+    public PagedList<ShareLinkBean> shares(Integer pageNo, Integer pageSize) throws BimfaceException {
+        return shareLinkService.shareList(pageNo, pageSize);
     }
 
     /**
      * 获取单文件模型对应构件下的属性
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getSingleModelElementV2(java.lang.Long, java.lang.String)
      *
      * @param fileId    文件id
      * @param elementId 构件id
      * @return PropertyBean {@link Property}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public Property getProperty(Long fileId, String elementId) throws BimfaceException {
         return propertyService.getElementProperty(fileId, elementId);
     }
 
     /**
      * 获取集成模型对应构件下的属性
+     * 已过时，推荐使用：com.bimface.sdk.BimfaceClient#getIntegrateModelElementMaterials(java.lang.Long, java.lang.String, java.lang.String)
      *
      * @param integrateId 集成id
      * @param fileId      文件id
      * @param elementId   构件id
      * @return {@link Property}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public Property getIntegrationProperty(Long integrateId, Long fileId,
                                            String elementId) throws BimfaceException {
         return propertyService.getIntegrationElementProperty(integrateId, fileId, elementId);
@@ -678,44 +799,62 @@ public class BimfaceClient {
 
     /**
      * 获取单文件构件分类树
+     * 已过时，推荐使用V2版本文件分类数
+     * com.bimface.sdk.BimfaceClient#getSingleModelTreeV2(java.lang.Long, com.bimface.data.bean.FileTreeRequestBody)
      *
      * @param fileId 文件id
      * @return List&lt;{@link Category}&gt;
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public List<Category> getCategory(Long fileId) throws BimfaceException {
         return categoryTreeService.getCategoryTree(fileId);
     }
 
     /**
      * 获取单文件构件分类树V2
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getSingleModelTreeV2(java.lang.Long, com.bimface.data.bean.FileTreeRequestBody)
      *
      * @param fileId 文件id
      * @return List&lt;{@link Tree.TreeNode}&gt;
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public List<Tree.TreeNode> getCategoryV2(Long fileId) throws BimfaceException {
         return categoryTreeService.getCategoryTreeV2(fileId);
     }
 
     /**
      * 获取集成模型专业层次结构
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getIntegrateModelTree(java.lang.Long, java.lang.String,
+     * java.util.List, com.bimface.data.bean.IntegrationTreeOptionalRequestBody)
      *
      * @param integrateId 集成id
      * @return {@link SpecialtyTree}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public SpecialtyTree getSpecialtyTree(Long integrateId) throws BimfaceException {
         return categoryTreeService.getSpecialtyTree(integrateId);
     }
 
     /**
      * 获取集成模型楼层层次结构
+     * 已过时，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getIntegrateModelTree(java.lang.Long, java.lang.String,
+     * java.util.List, com.bimface.data.bean.IntegrationTreeOptionalRequestBody)
      *
      * @param integrateId 集成id
      * @return {@link FloorTree}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public FloorTree getFloorTree(Long integrateId) throws BimfaceException {
         return categoryTreeService.getFloorTree(integrateId);
     }
@@ -740,6 +879,17 @@ public class BimfaceClient {
      */
     public FileIntegrateBean getIntegrate(Long integrateId) throws BimfaceException {
         return integrateService.getIntegrate(integrateId);
+    }
+
+    /**
+     * 批量获取文件集成状态
+     *
+     * @param integrateQueryRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public PagedList<FileIntegrateDetailBean> getIntegrates(IntegrateQueryRequest integrateQueryRequest) throws BimfaceException {
+        return integrateService.getIntegrates(integrateQueryRequest);
     }
 
     /**
@@ -890,53 +1040,104 @@ public class BimfaceClient {
 
     /**
      * 获取楼层信息
+     * 已过时：推荐使用：
+     * com.bimface.sdk.BimfaceClient#getFileFloors(java.lang.Long, boolean, boolean)
      *
      * @param fileId 文件Id
      * @return 楼层列表
      * @throws BimfaceException {@link BimfaceClient}
+     * @deprecated
      */
+    @Deprecated
     public List<Floor> getFileFloors(Long fileId) throws BimfaceException {
-        return floorService.getFileFloors(fileId);
+        return getFileFloors(fileId, false, false);
+    }
+
+    /**
+     * 获取楼层信息
+     *
+     * @param fileId      fileId 文件Id
+     * @param includeArea 是否将楼层中的面积分区ID、名称一起返回
+     * @param includeRoom 是否将楼层中的房间ID、名称一起返回
+     * @return 楼层列表
+     * @throws BimfaceException
+     */
+    public List<Floor> getFileFloors(Long fileId, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
+        return floorService.getFileFloors(fileId, includeArea, includeRoom);
+    }
+
+    /**
+     * 获取集成模型楼层信息
+     * 已过时：推荐使用 com.bimface.sdk.BimfaceClient#getIntegrateFloors(java.lang.Long, java.lang.Boolean, java.lang.Boolean)
+     *
+     * @param integrateId 模型集成ID
+     * @return 楼层列表
+     * @throws BimfaceException {@link BimfaceClient}
+     * @deprecated
+     */
+    @Deprecated
+    public List<Floor> getIntegrateFloors(Long integrateId) throws BimfaceException {
+        return getIntegrateFloors(integrateId, false, false);
     }
 
     /**
      * 获取集成模型楼层信息
      *
      * @param integrateId 模型集成ID
+     * @param includeArea 是否将楼层中的空间ID、名称一起返回
+     * @param includeRoom 是否将楼层中的房间ID、名称一起返回
      * @return 楼层列表
-     * @throws BimfaceException {@link BimfaceClient}
+     * @throws BimfaceException
      */
-    public List<Floor> getIntegrateFloors(Long integrateId) throws BimfaceException {
-        return floorService.getIntegrateFloors(integrateId);
+    public List<Floor> getIntegrateFloors(Long integrateId, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
+        return floorService.getIntegrateFloors(integrateId, includeArea, includeRoom);
     }
 
     /**
-     * 按查询条件查询构件ID 组，v2
+     * 按查询条件查询单模型构件ID 组，v2
+     * 已过时：推荐使用：
+     * com.bimface.sdk.BimfaceClient#getElementIdsV2(java.lang.Long,
+     * com.bimface.sdk.bean.request.QueryElementIdsRequest)
      *
-     * @param fileId 文件ID
-     * @param specialty 专业
-     * @param floor 楼层
-     * @param categoryId    类别
-     * @param family    族
-     * @param familyType    族类型
+     * @param fileId     文件ID
+     * @param specialty  专业
+     * @param floor      楼层
+     * @param categoryId 类别
+     * @param family     族
+     * @param familyType 族类型
      * @return 构件 ID 列表
      * @throws BimfaceException {@link BimfaceClient}
      */
+    @Deprecated
     public List<String> getElementIdsV2(Long fileId, String specialty, String floor, String categoryId,
                                         String family, String familyType) throws BimfaceException {
-        return elementService.getElementIdsV2(fileId, specialty, floor, categoryId, family, familyType);
+        QueryElementIdsRequest queryElementIdsRequest = new QueryElementIdsRequest(specialty, floor, categoryId, family,
+                familyType);
+        return getElementIdsV2(fileId, queryElementIdsRequest);
+    }
+
+    /**
+     * 按查询条件查询单模型构件ID 组，v2
+     *
+     * @param fileId
+     * @param queryElementIdsRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public List<String> getElementIdsV2(Long fileId, QueryElementIdsRequest queryElementIdsRequest) throws BimfaceException {
+        return elementService.getElementIdsV2(fileId, queryElementIdsRequest);
     }
 
     /**
      * 获取单模型文件 id 与楼层的映射关系，v2
      *
-     * @param fileIds   文件 IDs
-     * @param includeArea   includeArea
+     * @param fileIds     文件 IDs
+     * @param includeArea includeArea
      * @param includeRoom includeRoom
      * @return 楼层的映射关系
      * @throws BimfaceException {@link BimfaceClient}
      */
-    public Map<String, Object> getSingleModelFileIdFloorsMapping(List<String> fileIds, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
+    public List<Map<String, Object>> getSingleModelFileIdFloorsMapping(List<String> fileIds, Boolean includeArea, Boolean includeRoom) throws BimfaceException {
         return floorService.getSingleModelFileIdFloorsMapping(fileIds, includeArea, includeRoom);
     }
 
@@ -945,23 +1146,57 @@ public class BimfaceClient {
      *
      * @param fileId    文件ID
      * @param elementId 构件ID
-     * @return  构件
+     * @return 构件
      * @throws BimfaceException {@link BimfaceClient}
      */
     public Property getSingleModelElementV2(Long fileId, String elementId) throws BimfaceException {
-        return elementService.getSingleModelElementV2(fileId, elementId);
+        return getSingleModelElementV2(fileId, elementId, false);
+    }
+
+    /**
+     * 获取单模型构件，v2
+     *
+     * @param fileId           文件ID
+     * @param elementId        构件ID
+     * @param includeOverrides 是否查询修改的属性
+     * @return 构件
+     * @throws BimfaceException {@link BimfaceClient}
+     */
+    public Property getSingleModelElementV2(Long fileId, String elementId, boolean includeOverrides) throws BimfaceException {
+        return elementService.getSingleModelElementV2(fileId, elementId, includeOverrides);
     }
 
     /**
      * 根据构件 ID 批量获取单模型的单个构件，v2
+     * 即将过期，推荐使用：
+     * com.bimface.sdk.BimfaceClient#getSingleModelElementsV2(java.lang.Long, java.util.List, java.util.List, boolean)
      *
-     * @param fileId    文件ID
-     * @param elementIds    构件IDs
-     * @return  构件
+     * @param fileId     文件ID
+     * @param elementIds 构件IDs
+     * @return 构件
      * @throws BimfaceException {@link BimfaceClient}
+     * @deprecated
      */
+    @Deprecated
     public List<Property> getSingleModelElementsV2(Long fileId, List<String> elementIds) throws BimfaceException {
         return elementService.getSingleModelElementsV2(fileId, elementIds);
+    }
+
+    /**
+     * 根据构件 ID 批量获取单模型的单个构件，v2
+     * 支持查询模型属性重写后构件的属性，需要设置请求参数includeOverrides的值为true
+     *
+     * @param fileId           文件ID
+     * @param elementIds       构件IDs
+     * @param filter           查询筛选条件，可选
+     * @param includeOverrides 是否查询修改的属性
+     * @return 构件
+     * @throws BimfaceException {@link BimfaceClient}
+     */
+    public List<Property> getSingleModelElementsV2(Long fileId, List<String> elementIds,
+                                                   List<ElementPropertyFilterRequest.GroupAndKeysPair> filter,
+                                                   boolean includeOverrides) throws BimfaceException {
+        return elementService.getSingleModelElementsV2(fileId, elementIds, filter, includeOverrides);
     }
 
     /**
@@ -973,7 +1208,20 @@ public class BimfaceClient {
      * @throws BimfaceException {@link BimfaceException}
      */
     public Property getElementPropertyV2(Long fileId, List<String> elementIds) throws BimfaceException {
-        return propertyService.getSingleModelElementPropertyV2(fileId, elementIds);
+        return propertyService.getSingleModelElementPropertyV2(fileId, elementIds, false);
+    }
+
+    /**
+     * 获取单文件的构件属性，v2
+     * 支持查询模型属性重写后多个构件的共同属性，需要设置请求参数includeOverrides的值为true
+     *
+     * @param fileId     文件id
+     * @param elementIds 构件id
+     * @return {@link Property}构件属性
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public Property getElementPropertyV2(Long fileId, List<String> elementIds, Boolean includeOverrides) throws BimfaceException {
+        return propertyService.getSingleModelElementPropertyV2(fileId, elementIds, includeOverrides);
     }
 
     /**
@@ -989,44 +1237,6 @@ public class BimfaceClient {
     }
 
     /**
-     * 单模型获取钢筋工程量, v2
-     *
-     * @param fileId 文件ID
-     * @param elementId 构件ID
-     * @return 钢筋工程量 {@link Bar}
-     * @throws BimfaceException {@link BimfaceClient}
-     */
-    public List<Bar> getSingleModelElementBars(Long fileId, String elementId) throws BimfaceException {
-        return elementService.getSingleModelElementBars(fileId, elementId);
-    }
-
-    /**
-     * 单模型获取构件工程量，v2
-     *
-     * @param fileId 文件ID
-     * @param elementId 构件ID
-     * @param type 类型
-     * @return 构件工程量 {@link Quantity}
-     * @throws BimfaceException
-     */
-    public List<Quantity> getSingleModelElementQuantities(Long fileId, String elementId, String type) throws BimfaceException {
-        return elementService.getSingleModelElementQuantities(fileId, elementId, type);
-    }
-
-    /**
-     * 获取多个构件的工程量汇总，v2
-     *
-     * @param fileId
-     * @param elementIds
-     * @return
-     * @throws BimfaceException
-     */
-    public List<AggregatedQuantity> getSingleModelAggregatedElementQuantities(Long fileId, List<String> elementIds, String type) throws BimfaceException {
-        return elementService.getSingleModelAggregatedElementQuantities(fileId, elementIds, type);
-    }
-
-
-    /**
      * 查询单模型三维视点信息，v2
      *
      * @param fileId
@@ -1040,14 +1250,34 @@ public class BimfaceClient {
 
     /**
      * Rvt单模型查询楼层对应房间列表，v2
+     * 已过时：推荐使用
+     * com.bimface.sdk.BimfaceClient#getSingleModelRooms(java.lang.Long, java.lang.String, java.lang.String,
+     * com.bimface.data.enums.ToleranceType, com.bimface.data.enums.ToleranceType)
+     *
+     * @param fileId
+     * @param floorId
+     * @return
+     * @throws BimfaceException
+     * @deprecated
+     */
+    @Deprecated
+    public List<Room> getSingleModelRooms(Long fileId, String floorId) throws BimfaceException {
+        return getSingleModelRooms(fileId, floorId, null, null, null);
+    }
+
+    /**
+     * Rvt单模型查询楼层对应房间列表，v2
+     * 当前支持两种方式查询房间列表：1）使用楼层ID查询属于给定楼层的房间列表；2）使用构件ID在空间中计算查询包含该构件的房间列表
+     * 这两种方式只能取其一，楼层ID优先。
      *
      * @param fileId
      * @param floorId
      * @return
      * @throws BimfaceException
      */
-    public List<Room> getSingleModelRooms(Long fileId, String floorId) throws BimfaceException {
-        return dataService.getSingleModelRooms(fileId, floorId);
+    public List<Room> getSingleModelRooms(Long fileId, String floorId, String elementId, ToleranceType roomToleranceZ,
+                                          ToleranceType roomToleranceXY) throws BimfaceException {
+        return dataService.getSingleModelRooms(fileId, floorId, elementId, roomToleranceZ, roomToleranceXY);
     }
 
     /**
@@ -1123,13 +1353,28 @@ public class BimfaceClient {
 
     /**
      * 单模型查询drawingSheets信息, v2
+     * 已过时：推荐使用 com.bimface.sdk.BimfaceClient#getSingleModelDrawingSheets(java.lang.Long, java.lang.String)
      *
-     * @param fileId
-     * @return
+     * @param fileId 文件ID
+     * @return 图纸列表
+     * @throws BimfaceException
+     * @deprecated
+     */
+    @Deprecated
+    public List<DrawingSheet> getSingleModelDrawingSheets(Long fileId) throws BimfaceException {
+        return getSingleModelDrawingSheets(fileId, null);
+    }
+
+    /**
+     * 单模型查询drawingSheets信息, v2
+     *
+     * @param fileId    文件ID
+     * @param elementId 构件ID
+     * @return 图纸列表
      * @throws BimfaceException
      */
-    public List<DrawingSheet> getSingleModelDrawingSheets(Long fileId) throws BimfaceException {
-        return dataService.getSingleModelDrawingSheets(fileId);
+    public List<DrawingSheet> getSingleModelDrawingSheets(Long fileId, String elementId) throws BimfaceException {
+        return dataService.getSingleModelDrawingSheets(fileId, elementId);
     }
 
     /**
@@ -1156,7 +1401,36 @@ public class BimfaceClient {
     }
 
     /**
+     * 修改（包含添加和更新）构件基本属性组以外的属性, V2
+     *
+     * @param fileId
+     * @param elementId
+     * @param propertyGroups 修改的属性
+     * @return
+     * @throws BimfaceException
+     */
+    public String updateSingleModelElementProperties(Long fileId, String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataService.updateSingleModelElementProperties(fileId, elementId, propertyGroups);
+    }
+
+    /**
+     * 删除构件基本属性组以外的属性, V2
+     *
+     * @param fileId
+     * @param elementId
+     * @param propertyGroups 删除的属性
+     * @return
+     * @throws BimfaceException
+     */
+    public String deleteSingleModelElementProperties(Long fileId, String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataService.deleteSingleModelElementProperties(fileId, elementId, propertyGroups);
+    }
+
+    /**
      * 获取集成模型构件ID组, v2
+     * 已过时：推荐使用：
+     * com.bimface.sdk.BimfaceClient#getIntegrateModelElementIds(java.lang.Long,
+     * com.bimface.sdk.bean.request.QueryElementIdsRequest)
      *
      * @param integrateId
      * @param specialty
@@ -1169,23 +1443,84 @@ public class BimfaceClient {
      * @return
      * @throws BimfaceException
      */
+    @Deprecated
     public ElementsWithBoundingBox getIntegrateModelElementIds(Long integrateId, String specialty, String roomId,
                                                                String floor, String categoryId, String family,
                                                                String familyType, String systemType) throws BimfaceException {
-        return dataService.getIntegrateModelElementIds(integrateId, specialty, roomId, floor, categoryId, family, familyType, systemType);
+        QueryElementIdsRequest queryElementIdsRequest = new QueryElementIdsRequest(specialty, floor, categoryId, family,
+                familyType);
+        queryElementIdsRequest.setRoomId(roomId);
+        queryElementIdsRequest.setSystemType(systemType);
+        return getIntegrateModelElementIds(integrateId, queryElementIdsRequest);
+    }
+
+    /**
+     * 获取集成模型构件ID组, v2
+     *
+     * @param integrateId
+     * @param queryElementIdsRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public ElementsWithBoundingBox getIntegrateModelElementIds(Long integrateId, QueryElementIdsRequest queryElementIdsRequest) throws BimfaceException {
+        return dataService.getIntegrateModelElementIds(integrateId, queryElementIdsRequest);
+    }
+
+    /**
+     * 修改集成模型指定构件的属性, V2
+     *
+     * @param integrateId
+     * @param fileIdHash
+     * @param elementId
+     * @param propertyGroups
+     * @return
+     * @throws BimfaceException
+     */
+    public String updateIntegrateModelElementProperties(Long integrateId, String fileIdHash,
+                                                        String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataService.updateIntegrateModelElementProperties(integrateId, fileIdHash, elementId, propertyGroups);
+    }
+
+    /**
+     * 删除集成模型指定构件的属性, V2
+     *
+     * @param integrateId
+     * @param fileIdHash
+     * @param elementId
+     * @param propertyGroups
+     * @return
+     * @throws BimfaceException
+     */
+    public String deleteIntegrateModelElementProperties(Long integrateId, String fileIdHash,
+                                                        String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataService.deleteIntegrateModelElementProperties(integrateId, fileIdHash, elementId, propertyGroups);
     }
 
     /**
      * 获取集成模型构件, v2
      *
      * @param integrateId
-     * @param fileId
+     * @param fileIdHash
      * @param elementId
      * @return
      * @throws BimfaceException
      */
-    public Property getIntegrateModelElement(Long integrateId, Long fileId, String elementId) throws BimfaceException {
-        return dataService.getIntegrateModelElement(integrateId, fileId, elementId);
+    public Property getIntegrateModelElement(Long integrateId, String fileIdHash, String elementId) throws BimfaceException {
+        return dataService.getIntegrateModelElement(integrateId, fileIdHash, elementId, false);
+    }
+
+    /**
+     * 获取集成模型构件, v2
+     * 支持查询模型属性重写后多个构件的共同属性，需要设置请求参数includeOverrides的值为true
+     *
+     * @param integrateId
+     * @param fileIdHash
+     * @param elementId
+     * @return
+     * @throws BimfaceException
+     */
+    public Property getIntegrateModelElement(Long integrateId, String fileIdHash, String elementId, Boolean includeOverrides) throws BimfaceException {
+        return dataService.getIntegrateModelElement(integrateId, fileIdHash, elementId, includeOverrides);
     }
 
     /**
@@ -1198,18 +1533,6 @@ public class BimfaceClient {
      */
     public Property getIntegrateModelElement(Long integrateId, String elementId) throws BimfaceException {
         return dataService.getIntegrateModelElement(integrateId, elementId);
-    }
-
-    /**
-     * 获取集成模型构件属性, v2
-     *
-     * @param integrateId
-     * @param fileIdHashWithElementIds {@link FileIdHashWithElementIds}
-     * @return {@link Property}
-     * @throws BimfaceException
-     */
-    public List<Property> getIntegrateModelElementProperties(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds) throws BimfaceException {
-        return dataService.getIntegrateModelElementProperties(integrateId, fileIdHashWithElementIds);
     }
 
     /**
@@ -1229,7 +1552,7 @@ public class BimfaceClient {
      * 获取集成模型分类树，v2
      *
      * @param integrateId
-     * @param treeType
+     * @param treeType         可选为：floor, specialty和customized三种类型
      * @param desiredHierarchy
      * @param requestBody
      * @return
@@ -1254,14 +1577,37 @@ public class BimfaceClient {
 
     /**
      * 集成模型查询楼层对应房间列表, v2
+     * 已过时：推荐使用：
+     * com.bimface.sdk.BimfaceClient#getIntegrateModelRooms(java.lang.Long, java.lang.String,
+     * java.lang.String, com.bimface.data.enums.ToleranceType, com.bimface.data.enums.ToleranceType)
      *
      * @param integrateId
      * @param floorId
      * @return
      * @throws BimfaceException
+     * @deprecated
      */
+    @Deprecated
     public List<Room> getIntegrateModelRooms(Long integrateId, String floorId) throws BimfaceException {
-        return dataService.getIntegrateModelRooms(integrateId, floorId);
+        return getIntegrateModelRooms(integrateId, floorId, null, null, null);
+    }
+
+    /**
+     * 集成模型查询楼层对应房间列表, v2
+     * 当前支持两种方式查询房间列表：1）使用楼层ID查询属于给定楼层的房间列表；2）使用构件ID在空间中计算查询包含该构件的房间列表
+     * 这两种方式只能取其一，楼层ID优先。
+     *
+     * @param integrateId
+     * @param floorId
+     * @param elementId
+     * @param roomToleranceZ
+     * @param roomToleranceXY
+     * @return
+     * @throws BimfaceException
+     */
+    public List<Room> getIntegrateModelRooms(Long integrateId, String floorId, String elementId, ToleranceType roomToleranceZ,
+                                             ToleranceType roomToleranceXY) throws BimfaceException {
+        return dataService.getIntegrateModelRooms(integrateId, floorId, elementId, roomToleranceZ, roomToleranceXY);
     }
 
     /**
@@ -1301,80 +1647,14 @@ public class BimfaceClient {
     }
 
     /**
-     * 集成模型查询构件工程量, v2
-     *
-     * @param integrateId
-     * @param fileId
-     * @param elementId
-     * @param type
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Quantity> getIntegrateModelElementQuantities(Long integrateId, Long fileId, String elementId, String type) throws BimfaceException {
-        return dataService.getIntegrateModelElementQuantities(integrateId, fileId, elementId, type);
-    }
-
-    /**
-     * 集成模型查询构件工程量, v2
-     *
-     * @param integrateId
-     * @param elementId
-     * @param type
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Quantity> getIntegrateModelElementQuantities(Long integrateId, String elementId, String type) throws BimfaceException {
-        return dataService.getIntegrateModelElementQuantities(integrateId, elementId, type);
-    }
-
-    /**
-     * 查询集成模型构件的汇总工程量, v2
-     *
-     * @param integrateId
-     * @param fileIdHashWithElementIds
-     * @param type
-     * @return
-     * @throws BimfaceException
-     */
-    public List<AggregatedQuantity> getIntegrateModelAccumulativeQuantities(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds, String type) throws BimfaceException {
-        return dataService.getIntegrateModelAccumulativeQuantities(integrateId, fileIdHashWithElementIds, type);
-    }
-
-    /**
      * 查询指定的集成模型内参与集成的子文件信息, v2
      *
      * @param integrateId
      * @return
      * @throws BimfaceException
      */
-    public List<IntegrateFile> getIntegrateFiles(Long integrateId) throws BimfaceException {
+    public List<IntegrateFileData> getIntegrateFiles(Long integrateId) throws BimfaceException {
         return dataService.getIntegrateFiles(integrateId);
-    }
-
-
-    /**
-     * 查询集成模型钢筋量，v2
-     *
-     * @param integrateId
-     * @param fileId
-     * @param elementId
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Bar> getIntegrateModelElementBars(Long integrateId, Long fileId, String elementId) throws BimfaceException {
-        return dataService.getIntegrateModelElementBars(integrateId, fileId, elementId);
-    }
-
-    /**
-     * 查询集成模型钢筋量，v2
-     *
-     * @param integrateId
-     * @param elementId
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Bar> getIntegrateModelElementBars(Long integrateId, String elementId) throws BimfaceException {
-        return dataService.getIntegrateModelElementBars(integrateId, elementId);
     }
 
     /**
@@ -1444,7 +1724,21 @@ public class BimfaceClient {
      * @throws BimfaceException
      */
     public Property getIntegrateModelCommonElementProperties(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds) throws BimfaceException {
-        return dataService.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds);
+        return dataService.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds, false);
+    }
+
+    /**
+     * 集成模型获取构件属性
+     * 支持查询模型属性重写后多个构件的共同属性，需要设置请求参数includeOverrides的值为true
+     *
+     * @param integrateId
+     * @param fileIdHashWithElementIds
+     * @param includeOverrides
+     * @return
+     * @throws BimfaceException
+     */
+    public Property getIntegrateModelCommonElementProperties(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds, Boolean includeOverrides) throws BimfaceException {
+        return dataService.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds, includeOverrides);
     }
 
     /**
@@ -1472,7 +1766,7 @@ public class BimfaceClient {
      * @return
      * @throws BimfaceException
      */
-    public List<ElementBusinessAssociation> getAssociationsByElementId(String integrateId,String elementId, String businessType,
+    public List<ElementBusinessAssociation> getAssociationsByElementId(String integrateId, String elementId, String businessType,
                                                                        String businessFlag) throws BimfaceException {
         return dataService.getAssociationsByElementId(integrateId, elementId, businessType, businessFlag);
     }
@@ -1507,6 +1801,7 @@ public class BimfaceClient {
 
     /**
      * 删除业务ID关联的业务挂接
+     *
      * @param integrateId
      * @param businessType
      * @param businessId
@@ -1716,36 +2011,40 @@ public class BimfaceClient {
 
     /**
      * 获取文件的数据包根URL
+     *
      * @param fileId
      * @return
      * @throws BimfaceException
      */
-    public String getFileDataBagRootUrl(Long fileId) throws BimfaceException{
+    public String getFileDataBagRootUrl(Long fileId) throws BimfaceException {
         return databagService.getFileDataBagRootUrl(fileId);
     }
 
     /**
      * 获取集成数据包的根Url
+     *
      * @param integrateId
      * @return
      * @throws BimfaceException
      */
-    public String getIntegrateDatabagRootUrl(Long integrateId) throws BimfaceException{
+    public String getIntegrateDatabagRootUrl(Long integrateId) throws BimfaceException {
         return databagService.getIntegrateDatabagRootUrl(integrateId);
     }
 
     /**
      * 获取数据包下载流
+     *
      * @param fileId
      * @return
      * @throws BimfaceException
      */
-    public InputStream getFileDatabagContent(Long fileId) throws BimfaceException{
+    public InputStream getFileDatabagContent(Long fileId) throws BimfaceException {
         return databagService.getFileDatabagContent(fileId);
     }
 
     /**
      * 获取数据包大小
+     *
      * @param fileId
      * @return
      * @throws BimfaceException

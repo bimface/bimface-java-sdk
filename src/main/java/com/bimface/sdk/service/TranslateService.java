@@ -1,15 +1,18 @@
 package com.bimface.sdk.service;
 
 import com.bimface.api.bean.request.translate.FileTranslateRequest;
+import com.bimface.api.bean.request.translate.TranslateQueryRequest;
 import com.bimface.api.bean.response.FileTranslateBean;
+import com.bimface.api.bean.response.FileTranslateDetailBean;
 import com.bimface.exception.BimfaceException;
+import com.bimface.page.PagedList;
 import com.bimface.sdk.client.ApiClient;
 import com.bimface.sdk.config.Endpoint;
 import com.bimface.sdk.utils.AssertUtils;
 
 /**
  * 文件转换
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class TranslateService {
@@ -24,7 +27,7 @@ public class TranslateService {
 
     /**
      * 发起文件转换
-     * 
+     *
      * @param request 文件转换请求
      * @return {@link FileTranslateBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -67,6 +70,15 @@ public class TranslateService {
         return apiClient.getTranslation(fileId, accessToken);
     }
 
+    /**
+     * 批量查看文件转换状态
+     * @param translateQueryRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public PagedList<FileTranslateDetailBean> getTranslates(TranslateQueryRequest translateQueryRequest) throws BimfaceException {
+        return apiClient.getTranslations(translateQueryRequest, accessTokenService.getAccessToken());
+    }
 
     private void check(FileTranslateRequest request) {
         AssertUtils.assertParameterNotNull(request, "TranslateRequest");

@@ -6,7 +6,7 @@ import com.bimface.sdk.config.Endpoint;
 
 /**
  * 获取viewToken
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class ViewTokenService {
@@ -20,7 +20,7 @@ public class ViewTokenService {
 
     /**
      * 用fileId获取单文件浏览凭证
-     * 
+     *
      * @param fileId 文件id
      * @return String
      * @throws BimfaceException {@link BimfaceException}
@@ -42,7 +42,7 @@ public class ViewTokenService {
 
     /**
      * 获取集成模型的浏览凭证
-     * 
+     *
      * @param integrateId 集成id
      * @return String
      * @throws BimfaceException {@link BimfaceException}

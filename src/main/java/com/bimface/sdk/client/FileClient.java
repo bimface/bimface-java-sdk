@@ -1,10 +1,7 @@
 package com.bimface.sdk.client;
 
 import com.bimface.exception.BimfaceException;
-import com.bimface.file.bean.AppendFileBean;
-import com.bimface.file.bean.FileBean;
-import com.bimface.file.bean.SupportFileBean;
-import com.bimface.file.bean.UploadPolicyBean;
+import com.bimface.file.bean.*;
 import com.bimface.http.BimfaceResponseChecker;
 import com.bimface.sdk.interfaces.FileInterface;
 import com.glodon.paas.foundation.restclient.RESTClientBuilder;
@@ -16,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.List;
 
 public class FileClient extends AbstractClient {
     private final static Logger logger = LoggerFactory.getLogger(FileClient.class);
@@ -92,6 +90,21 @@ public class FileClient extends AbstractClient {
     public FileBean getFileMetaData(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(fileClient.getFileMetaData(fileId, accessToken));
+    }
+
+    public FileBean getFile(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(fileClient.getFile(fileId, accessToken));
+    }
+
+    public List<FileBean> getFiles(String suffix, String status,String startTime, String endTime, Long offset, Long rows, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(fileClient.getFiles(suffix, status, startTime, endTime, offset, rows, accessToken));
+    }
+
+    public FileUploadStatusBean getFileUploadStatus(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(fileClient.getFileUploadStatus(fileId, accessToken));
     }
 
     public String getFileDownloadUrl(@NotNull Long fileId, String fileName, @NotNull String accessToken) throws BimfaceException {

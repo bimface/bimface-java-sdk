@@ -13,7 +13,7 @@ import java.net.URL;
 
 /**
  * 文件下载
- * 
+ *
  * @author bimface, 2016-11-01.
  */
 public class DownloadService  {
@@ -28,7 +28,7 @@ public class DownloadService  {
 
     /**
      * 获取文件下载链接
-     * 
+     *
      * @param accessToken 登录后的授权凭证
      * @param fileId 文件Id
      * @return String
@@ -44,7 +44,7 @@ public class DownloadService  {
 
     /**
      * 获取文件下载链接
-     * 
+     *
      * @param fileId 文件Id
      * @param fileName 文件名
      * @return String
