@@ -1,18 +1,17 @@
 package com.bimface.sdk.interfaces;
 
-import com.bimface.file.bean.AppendFileBean;
-import com.bimface.file.bean.FileBean;
-import com.bimface.file.bean.SupportFileBean;
-import com.bimface.file.bean.UploadPolicyBean;
+import com.bimface.file.bean.*;
 import com.glodon.paas.foundation.restclient.RESTResponse;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
+import java.util.List;
+
 public interface FileInterface {
     @PUT("upload")
     Call<RESTResponse<FileBean>> uploadFileStream(@Query("name") String fileName, @Query("sourceId") String sourceId,
-                                                  @Header("Content-Length") Long fileLength, @Body RequestBody body,
+                                                  @Header("Content-Length") Long fileLength, @Body RequestBody file,
                                                   @Header("Authorization") String accessToken);
 
     @PUT("upload")
@@ -48,6 +47,21 @@ public interface FileInterface {
 
     @GET("metadata")
     Call<RESTResponse<FileBean>> getFileMetaData(@Query("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @GET("files/{fileId}")
+    Call<RESTResponse<FileBean>> getFile(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @GET("files")
+    Call<RESTResponse<List<FileBean>>> getFiles(@Query("suffix") String suffix,
+                                                @Query("status") String status,
+                                                @Query("startTime") String startTime,
+                                                @Query("endTime") String endTime,
+                                                @Query("offset") Long offset,
+                                                @Query("rows") Long rows,
+                                                @Header("Authorization") String accessToken);
+
+    @GET("files/{fileId}/uploadStatus")
+    Call<RESTResponse<FileUploadStatusBean>> getFileUploadStatus(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
 
     @GET("download/url")
     Call<RESTResponse<String>> getFileDownloadUrl(@Query("fileId") Long fileId, @Query("name") String fileName, @Header("Authorization") String accessToken);

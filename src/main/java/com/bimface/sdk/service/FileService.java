@@ -1,10 +1,8 @@
 package com.bimface.sdk.service;
 
 import com.bimface.exception.BimfaceException;
-import com.bimface.file.bean.AppendFileBean;
-import com.bimface.file.bean.FileBean;
-import com.bimface.file.bean.SupportFileBean;
-import com.bimface.file.bean.UploadPolicyBean;
+import com.bimface.file.bean.*;
+import com.bimface.sdk.bean.request.FileBatchQueryRequest;
 import com.bimface.sdk.bean.request.FileUploadRequest;
 import com.bimface.sdk.client.FileClient;
 import com.bimface.sdk.config.Endpoint;
@@ -20,6 +18,8 @@ import okio.BufferedSink;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 文件上传
@@ -67,7 +67,7 @@ public class FileService {
     /**
      * 获取上传凭证
      *
-     * @param name 上传文件名,（带后缀名）
+     * @param name     上传文件名,（带后缀名）
      * @param sourceId 上传源文件Id（非必选）
      * @return {@link UploadPolicyBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -95,10 +95,10 @@ public class FileService {
     /**
      * 通过申请上传Policy的方式直接上传到OSS
      *
-     * @param name 上传文件名
-     * @param sourceId 上传源文件Id（非必选）
+     * @param name          上传文件名
+     * @param sourceId      上传源文件Id（非必选）
      * @param contentLength 文件长度
-     * @param inputStream 二进制文件流
+     * @param inputStream   二进制文件流
      * @return {@link FileBean}
      * @throws BimfaceException {@link BimfaceException}
      */
@@ -126,15 +126,15 @@ public class FileService {
             }
         }
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("key",
-                                                                                              policy.getObjectKey()).addFormDataPart("success_action_status",
-                                                                                                                                     "200").addFormDataPart("Content-Disposition",
-                                                                                                                                                            "attachment;filename=" + name).addFormDataPart("OSSAccessKeyId",
-                                                                                                                                                                                                           policy.getAccessId()).addFormDataPart("policy",
-                                                                                                                                                                                                                                                 policy.getPolicy()).addFormDataPart("Signature",
-                                                                                                                                                                                                                                                                                     policy.getSignature()).addFormDataPart("callback",
-                                                                                                                                                                                                                                                                                                                            policy.getCallbackBody()).addFormDataPart("file",
-                                                                                                                                                                                                                                                                                                                                                                      name,
-                                                                                                                                                                                                                                                                                                                                                                      RESTStreamRequestBody.create(MediaType.parse(BimfaceConstants.STREAM_MIME), contentLength, inputStream)).build();
+                policy.getObjectKey()).addFormDataPart("success_action_status",
+                "200").addFormDataPart("Content-Disposition",
+                "attachment;filename=" + name).addFormDataPart("OSSAccessKeyId",
+                policy.getAccessId()).addFormDataPart("policy",
+                policy.getPolicy()).addFormDataPart("Signature",
+                policy.getSignature()).addFormDataPart("callback",
+                policy.getCallbackBody()).addFormDataPart("file",
+                name,
+                RESTStreamRequestBody.create(MediaType.parse(BimfaceConstants.STREAM_MIME), contentLength, inputStream)).build();
         return fileClient.uploadByPolicy(policy.getHost(), body);
     }
 
@@ -178,9 +178,10 @@ public class FileService {
 
     /**
      * 创建追加文件
-     * @param name 文件的全名，使用URL编码（UTF-8），最多256个字符
+     *
+     * @param name     文件的全名，使用URL编码（UTF-8），最多256个字符
      * @param sourceId 调用方的文件源ID，不能重复
-     * @param length 上传文件长度
+     * @param length   上传文件长度
      * @return AppendFileBean {@link AppendFileBean}
      * @throws BimfaceException {@link BimfaceException}
      */
@@ -189,7 +190,7 @@ public class FileService {
     }
 
     public AppendFileBean createAppendFile(String name, String sourceId, Long length, String accessToken) throws BimfaceException {
-    	// 文件名校验
+        // 文件名校验
         FileNameUtils.checkFileName(name);
         AssertUtils.assertParameterNotNull(length, "length");
         // sourceId为null时设为""
@@ -206,6 +207,7 @@ public class FileService {
 
     /**
      * 查询追加文件信息
+     *
      * @param appendFileId
      * @return AppendFileBean {@link AppendFileBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -220,6 +222,7 @@ public class FileService {
 
     /**
      * 追加上传
+     *
      * @param appendFileId
      * @return AppendFileBean {@link AppendFileBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -229,7 +232,7 @@ public class FileService {
     }
 
     public AppendFileBean uploadAppendFile(InputStream inputStream, Long appendFileId, String accessToken) throws BimfaceException {
-    	AppendFileBean appendFileBean = queryAppendFile(appendFileId, accessToken);
+        AppendFileBean appendFileBean = queryAppendFile(appendFileId, accessToken);
 
         RequestBody body = requestIOFromPosition(inputStream, appendFileBean);
 
@@ -237,7 +240,7 @@ public class FileService {
     }
 
     private static RequestBody requestIOFromPosition(final InputStream inputStream, final AppendFileBean appendFileBean) {
-    	if (inputStream == null) throw new NullPointerException("content == null");
+        if (inputStream == null) throw new NullPointerException("content == null");
 
         return new RequestBody() {
 
@@ -254,7 +257,7 @@ public class FileService {
             @Override
             public void writeTo(BufferedSink sink) throws IOException {
                 try {
-                	inputStream.skip(appendFileBean.getPosition());
+                    inputStream.skip(appendFileBean.getPosition());
 
                     final byte[] buffer = new byte[BimfaceConstants.PUT_THRESHOLD];
                     int l;
@@ -274,9 +277,70 @@ public class FileService {
      * @param fileId 文件Id
      * @return {@link FileBean}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public FileBean getFileMetadata(Long fileId) throws BimfaceException {
         return fileClient.getFileMetaData(fileId, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 根据文件id获取文件元信息
+     *
+     * @param fileId 文件Id
+     * @return {@link FileBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public FileBean getFile(Long fileId) throws BimfaceException {
+        return fileClient.getFile(fileId, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 根据批量获取文件元信息
+     *
+     * @param request
+     * @return
+     * @throws BimfaceException
+     */
+    public List<FileBean> getFiles(FileBatchQueryRequest request) throws BimfaceException {
+        String startTime = null;
+        String endTime = null;
+        String status = null;
+        LocalDate from = request.getStartTime();
+        LocalDate to = request.getEndTime();
+        Long offset = request.getOffset();
+        Long rows = request.getRows();
+        if (from != null && to != null) {
+            AssertUtils.assertTrue(from.isBefore(to), "start time must be earlier than end time");
+        }
+        if (from != null) {
+            startTime = from.toString();
+        }
+        if (to != null) {
+            endTime = to.toString();
+        }
+        if (offset != null && offset < 0) {
+            throw new IllegalArgumentException("offset must be equal or greater than 0");
+        }
+        if (rows != null) {
+            AssertUtils.assertParameterInRange(rows, 1, 500);
+        }
+        if (request.getStatus() != null) {
+            status = request.getStatus().getName();
+        }
+        return fileClient.getFiles(request.getSuffix(), status,
+                startTime, endTime, offset, rows, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 根据文件id获取文件上传状态信息
+     *
+     * @param fileId 文件Id
+     * @return {@link FileBean}
+     * @throws BimfaceException {@link BimfaceException}
+     */
+    public FileUploadStatusBean getFileUploadStatus(Long fileId) throws BimfaceException {
+        return fileClient.getFileUploadStatus(fileId, accessTokenService.getAccessToken());
     }
 
     /**

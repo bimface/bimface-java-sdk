@@ -1,6 +1,7 @@
 package com.bimface.sdk.interfaces;
 
 import com.bimface.data.bean.*;
+import com.bimface.data.enums.ToleranceType;
 import com.glodon.paas.foundation.restclient.RESTResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -54,50 +55,45 @@ public interface DataInteface {
     Call<RESTResponse<Object>> getSingleModelTree(@Query("fileId") Long fileId, @Query("v") String version, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/elementIds")
-    Call<RESTResponse<List<String>>> getSingleModelElementIds(@Path("fileId") Long fileId, @Query("specialty") String specialty, @Query("floor") String floor,
-                                                              @Query("categoryId") String categoryId, @Query("family") String family, @Query("familyType") String familyType,
+    Call<RESTResponse<List<String>>> getSingleModelElementIds(@Path("fileId") Long fileId, @QueryMap Map<String, String> queryElementIdsParams,
                                                               @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileIds}/fileIdfloorsMappings")
-    Call<RESTResponse<Map<String, Object>>> getSingleModelFileIdFloorsMapping(@Query("fileIds") List<String> fileIds, @Query("includeArea") Boolean includeArea,
-                                                                              @Query("includeRoom") Boolean includeRoom, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<Map<String, Object>>>> getSingleModelFileIdFloorsMapping(@Path("fileIds") String fileIds, @Query("includeArea") Boolean includeArea,
+                                                                                    @Query("includeRoom") Boolean includeRoom, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/floors")
-    Call<RESTResponse<List<Floor>>> getSingleModelFloors(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<Floor>>> getSingleModelFloors(@Path("fileId") Long fileId, @Query("includeArea") Boolean includeArea,
+                                                         @Query("includeRoom") Boolean includeRoom, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/elements/{elementId}")
     Call<RESTResponse<Property>> getSingleModelElement(@Path("fileId") Long fileId, @Path("elementId") String elementId,
+                                                       @Query("includeOverrides") Boolean includeOverrides,
                                                        @Header("Authorization") String accessToken);
 
-    @GET("v2/files/{fileId}/elements")
-    Call<RESTResponse<List<Property>>> getSingleModelElements(@Path("fileId") Long fileId, @Query("elementIds") List<String> elementIds,
+    @POST("v2/files/{fileId}/elements")
+    Call<RESTResponse<List<Property>>> getSingleModelElements(@Path("fileId") Long fileId,
+                                                              @Query("includeOverrides") Boolean includeOverrides,
+                                                              @Body ElementPropertyFilterRequest elementPropertyFilterRequest,
                                                               @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/commonElementProperties")
     Call<RESTResponse<Property>> getSingleModelElementProperty(@Path("fileId") Long fileId, @Query("elementIds") List<String> elementIds,
-                                                               @Header("Authorization") String accessToken);
+                                                               @Query("includeOverrides") Boolean includeOverrides, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/elements/{elementId}/materials")
     Call<RESTResponse<List<MaterialInfo>>> getSingleModelElementMaterials(@Path("fileId") Long fileId, @Query("elementId") String elementId,
                                                                           @Header("Authorization") String accessToken);
 
-    @GET("v2/files/{fileId}/elements/{elementId}/bars")
-    Call<RESTResponse<List<Bar>>> getSingleModelElementBars(@Path("fileId") Long fileId, @Path("elementId") String elementId,
-                                                            @Header("Authorization") String accessToken);
-
-    @GET("v2/files/{fileId}/elements/{elementId}/quantities")
-    Call<RESTResponse<List<Quantity>>> getSingleModelElementQuantities(@Path("fileId") Long fileId, @Path("elementId") String elementId,
-                                                                       @Query("type") String type, @Header("Authorization") String accessToken);
-
-    @GET("v2/files/{fileId}/aggregatedElementQuantities")
-    Call<RESTResponse<List<AggregatedQuantity>>> getSingleModelAggregatedElementQuantities(@Path("fileId") Long fileId, @Query("elementIds") List<String> elementIds,
-                                                                                           @Query("type") String type, @Header("Authorization") String accessToken);
-
     @GET("v2/files/{fileId}/views")
     Call<RESTResponse<List<View>>> getSingleModelViews(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/rooms")
-    Call<RESTResponse<List<Room>>> getSingleModelRooms(@Path("fileId") Long fileId, @Query("floorId") String floorId,
+    Call<RESTResponse<List<Room>>> getSingleModelRooms(@Path("fileId") Long fileId,
+                                                       @Query("floorId") String floorId,
+                                                       @Query("elementId") String elementId,
+                                                       @Query("roomToleranceZ") ToleranceType roomToleranceZ,
+                                                       @Query("roomToleranceXY") ToleranceType roomToleranceXY,
                                                        @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/rooms/{roomId}")
@@ -125,7 +121,9 @@ public interface DataInteface {
     Call<RESTResponse<List<Link>>> getSingleModelLinks(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/drawingsheets")
-    Call<RESTResponse<List<DrawingSheet>>> getSingleModelDrawingSheets(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<DrawingSheet>>> getSingleModelDrawingSheets(@Path("fileId") Long fileId,
+                                                                       @Query("elementId") String elementId,
+                                                                       @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/modelInfo")
     Call<ResponseBody> getSingleModelModelInfo(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
@@ -133,28 +131,44 @@ public interface DataInteface {
     @GET("v2/files/{fileId}/elements/{elementId}/childElementIds")
     Call<RESTResponse<List<ElementIdWithName>>> getSingleModelChildElementIds(@Path("fileId") Long fileId, @Path("elementId") String elementId, @Header("Authorization") String accessToken);
 
+    @PUT("v2/files/{fileId}/elements/{elementId}/properties")
+    Call<RESTResponse<String>> updateSingleModelElementProperties(@Path("fileId") Long fileId, @Path("elementId") String elementId,
+                                                                  @Body List<PropertyGroup> propertyGroups, @Header("Authorization") String accessToken);
+
+    @HTTP(method = "DELETE", path = "v2/files/{fileId}/elements/{elementId}/properties", hasBody = true)
+    Call<RESTResponse<String>> deleteSingleModelElementProperties(@Path("fileId") Long fileId,
+                                                                  @Path("elementId") String elementId,
+                                                                  @Body List<PropertyGroup> propertyGroups,
+                                                                  @Header("Authorization") String accessToken);
+
     @GET("v2/integrations/{integrateId}/elementIds")
-    Call<RESTResponse<ElementsWithBoundingBox>> getIntegrateModelElementIds(@Path("integrateId") Long integrateId, @Query("specialty") String specialty, @Query("roomId") String roomId,
-                                                                            @Query("floor") String floor, @Query("categoryId") String categoryId, @Query("family") String family,
-                                                                            @Query("familyType") String familyType, @Query("systemType") String systemType, @Header("Authorization") String accessToken);
+    Call<RESTResponse<ElementsWithBoundingBox>> getIntegrateModelElementIds(@Path("integrateId") Long integrateId, @QueryMap Map<String, String> queryElementIdsParams, @Header("Authorization") String accessToken);
+
+    @PUT("v2/integrations/{integrateId}/files/{fileIdHash}/elements/{elementId}/properties")
+    Call<RESTResponse<String>> updateIntegrateModelElementProperties(@Path("integrateId") Long integrateId, @Path("fileIdHash") String fileIdHash,
+                                                                     @Path("elementId") String elementId, @Body List<PropertyGroup> propertyGroups,
+                                                                     @Header("Authorization") String accessToken);
+
+    @HTTP(method = "DELETE", path = "v2/integrations/{integrateId}/files/{fileIdHash}/elements/{elementId}/properties", hasBody = true)
+    Call<RESTResponse<String>> deleteIntegrateModelElementProperties(@Path("integrateId") Long integrateId, @Path("fileIdHash") String fileIdHash,
+                                                                     @Path("elementId") String elementId, @Body List<PropertyGroup> propertyGroups,
+                                                                     @Header("Authorization") String accessToken);
+
 
     @GET("v2/integrations/{integrateId}/floors")
-    Call<RESTResponse<List<Floor>>> getIntegrateModelFloors(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<Floor>>> getIntegrateModelFloors(@Path("integrateId") Long integrateId,
+                                                            @Query("includeArea") Boolean includeArea,
+                                                            @Query("includeRoom") Boolean includeRoom,
+                                                            @Header("Authorization") String accessToken);
 
-    @GET("v2/integrations/{integrateId}/files/{fileId}/elements/{elementId}")
-    Call<RESTResponse<Property>> getIntegrateModelElement(@Path("integrateId") Long integrateId, @Path("fileId") Long fileIdHash,
-                                                          @Path("elementId") String elementId, @Header("Authorization") String accessToken);
+    @GET("v2/integrations/{integrateId}/files/{fileIdHash}/elements/{elementId}")
+    Call<RESTResponse<Property>> getIntegrateModelElement(@Path("integrateId") Long integrateId, @Path("fileIdHash") String fileIdHash,
+                                                          @Path("elementId") String elementId, @Query("includeOverrides") Boolean includeOverrides,
+                                                          @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/elements/{elementId}")
     Call<RESTResponse<Property>> getIntegrateModelElement(@Path("integrateId") Long integrateId, @Path("elementId") String elementId,
                                                           @Header("Authorization") String accessToken);
-
-    @POST("v2/integrations/{integrateId}/elements")
-    Call<RESTResponse<List<Property>>> getIntegrateModelElementProperties(@Path("integrateId") Long integrateId, @Body List<FileIdHashWithElementIds> fileIdHashWithElementIds,
-                                                                          @Header("Authorization") String accessToken);
-
-    @GET("v2/integrations/{integrateId}/elements")
-    Call<RESTResponse<List<Property>>> getIntegrateModelElementProperties(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/files/{fileIdHash}/elements/{elementId}/materials")
     Call<RESTResponse<List<MaterialInfo>>> getIntegrateModelElementMaterials(@Path("integrateId") Long integrateId, @Path("fileIdHash") String fileIdHash,
@@ -175,7 +189,8 @@ public interface DataInteface {
 
     @GET("v2/integrations/{integrateId}/rooms")
     Call<RESTResponse<List<Room>>> getIntegrateModelRooms(@Path("integrateId") Long integrateId, @Query("floorId") String floorId,
-                                                          @Header("Authorization") String accessToken);
+                                                          @Query("elementId") String elementId, @Query("roomToleranceZ") ToleranceType roomToleranceZ,
+                                                          @Query("roomToleranceXY") ToleranceType roomToleranceXY, @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/rooms/{roomId}")
     Call<RESTResponse<Room>> getIntegrateModelRoom(@Path("integrateId") Long integrateId, @Path("roomId") String roomId,
@@ -189,31 +204,8 @@ public interface DataInteface {
     Call<RESTResponse<Area>> getIntegrateModelArea(@Path("integrateId") Long integrateId, @Path("areaId") String areaId,
                                                    @Header("Authorization") String accessToken);
 
-    @GET("v2/integrations/{integrateId}/files/{fileId}/elements/{elementId}/quantities")
-    Call<RESTResponse<List<Quantity>>> getIntegrateModelElementQuantities(@Path("integrateId") Long integrateId, @Path("fileId") Long fileId,
-                                                                          @Path("elementId") String elementId, @Query("type") String type,
-                                                                          @Header("Authorization") String accessToken);
-
-    @GET("v2/integrations/{integrateId}/elements/{elementId}/quantities")
-    Call<RESTResponse<List<Quantity>>> getIntegrateModelElementQuantities(@Path("integrateId") Long integrateId, @Path("elementId") String elementId,
-                                                                          @Query("type") String type, @Header("Authorization") String accessToken);
-
-    @POST("v2/integrations/{integrateId}/aggregatedElementQuantities")
-    Call<RESTResponse<List<AggregatedQuantity>>> getIntegrateModelAccumulativeQuantities(@Path("integrateId") Long integrateId, @Body List<FileIdHashWithElementIds> fileIdHashWithElementIds,
-                                                                                         @Query("type") String type, @Header("Authorization") String accessToken);
-
-    @GET("v2/integrations/{integrateId}/aggregatedElementQuantities")
-    Call<RESTResponse<List<AggregatedQuantity>>> getIntegrateModelAccumulativeQuantities(@Path("integrateId") Long integrateId, @Query("type") String type, @Header("Authorization") String accessToken);
-
     @GET("v2/integrations/{integrateId}/files")
-    Call<RESTResponse<List<IntegrateFile>>> getIntegrateFiles(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
-
-    @GET("v2/integrations/{integrateId}/files/{fileId}/elements/{elementId}/bars")
-    Call<RESTResponse<List<Bar>>> getIntegrateModelElementBars(@Path("integrateId") Long integrateId, @Path("fileId") Long fileId,
-                                                               @Path("elementId") String elementId, @Header("Authorization") String accessToken);
-
-    @GET("v2/integrations/{integrateId}/elements/{elementId}/bars")
-    Call<RESTResponse<List<Bar>>> getIntegrateModelElementBars(@Path("integrateId") Long integrateId, @Path("elementId") String elementId, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<IntegrateFileData>>> getIntegrateFiles(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/files/{fileId}/viewToken")
     Call<RESTResponse<String>> getIntegrateModelViewToken(@Path("integrateId") Long integrateId, @Path("fileId") String fileId, @Header("Authorization") String accessToken);
@@ -234,7 +226,7 @@ public interface DataInteface {
 
     @POST("v2/integrations/{integrateId}/commonElementProperties")
     Call<RESTResponse<Property>> getIntegrateModelCommonElementProperties(@Path("integrateId") Long integrateId, @Body List<FileIdHashWithElementIds> fileIdHashWithElementIds,
-                                                                          @Header("Authorization") String accessToken);
+                                                                          @Query("includeOverrides") Boolean includeOverrides, @Header("Authorization") String accessToken);
 
     @POST("v2/integrations/{integrateId}/commonElementProperties")
     Call<RESTResponse<Property>> getIntegrateModelCommonElementProperties(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);

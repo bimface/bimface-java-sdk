@@ -1,9 +1,12 @@
 package com.bimface.sdk.client;
 
 import com.bimface.data.bean.*;
+import com.bimface.data.enums.ToleranceType;
 import com.bimface.exception.BimfaceException;
 import com.bimface.http.BimfaceResponseChecker;
+import com.bimface.sdk.bean.request.QueryElementIdsRequest;
 import com.bimface.sdk.interfaces.DataInteface;
+import com.bimface.sdk.utils.ConvertUtils;
 import com.glodon.paas.foundation.restclient.RESTClientBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -39,6 +42,7 @@ public class DataClient extends AbstractClient {
         this.dataClient = builder.build(DataInteface.class);
     }
 
+    @Deprecated
     public Property getSingleModelElementProperty(@NotNull Long fileId, @NotNull String elementId,
                                                   @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
@@ -107,37 +111,37 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getSingleModelTree(fileId, version, accessToken));
     }
 
-    public List<String> getSingleModelElementIds(@NotNull Long fileId, String specialty, String floor, String categoryId,
-                                                 String family, String familyType, @NotNull String accessToken) throws BimfaceException {
+    public List<String> getSingleModelElementIds(@NotNull Long fileId, @NotNull QueryElementIdsRequest queryElementIdsRequest, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelElementIds(fileId, specialty, floor, categoryId,
-                family, familyType, accessToken));
+        return executeCall(dataClient.getSingleModelElementIds(fileId,
+                ConvertUtils.convertToParamsMap(queryElementIdsRequest), accessToken));
     }
 
-    public Map<String, Object> getSingleModelFileIdFloorsMapping(@NotNull List<String> fileIds, Boolean includeArea,
-                                                                 Boolean includeRoom, @NotNull String accessToken) throws BimfaceException {
+    public List<Map<String, Object>> getSingleModelFileIdFloorsMapping(@NotNull List<String> fileIds, Boolean includeArea,
+                                                                       Boolean includeRoom, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelFileIdFloorsMapping(fileIds, includeArea, includeRoom, accessToken));
+        String fileIdsList = fileIds.stream().reduce((i,j)->i+","+j).orElse(null);
+        return executeCall(dataClient.getSingleModelFileIdFloorsMapping(fileIdsList, includeArea, includeRoom, accessToken));
     }
 
-    public List<Floor> getSingleModelFloors(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+    public List<Floor> getSingleModelFloors(@NotNull Long fileId, Boolean includeArea, Boolean includeRoom, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelFloors(fileId, accessToken));
+        return executeCall(dataClient.getSingleModelFloors(fileId, includeArea, includeRoom, accessToken));
     }
 
-    public Property getSingleModelElement(@NotNull Long fileId, @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
+    public Property getSingleModelElement(@NotNull Long fileId, @NotNull String elementId, @NotNull Boolean includeOverrides, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelElement(fileId, elementId, accessToken));
+        return executeCall(dataClient.getSingleModelElement(fileId, elementId, includeOverrides, accessToken));
     }
 
-    public List<Property> getSingleModelElements(@NotNull Long fileId, List<String> elementIds, @NotNull String accessToken) throws BimfaceException {
+    public List<Property> getSingleModelElements(@NotNull Long fileId, Boolean includeOverrides, ElementPropertyFilterRequest elementPropertyFilterRequest, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelElements(fileId, elementIds, accessToken));
+        return executeCall(dataClient.getSingleModelElements(fileId, includeOverrides, elementPropertyFilterRequest, accessToken));
     }
 
-    public Property getSingleModelElementProperty(@NotNull Long fileId, @NotNull List<String> elementIds, @NotNull String accessToken) throws BimfaceException {
+    public Property getSingleModelElementProperty(@NotNull Long fileId, @NotNull List<String> elementIds, @NotNull Boolean includeOverrides, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelElementProperty(fileId, elementIds, accessToken));
+        return executeCall(dataClient.getSingleModelElementProperty(fileId, elementIds, includeOverrides, accessToken));
     }
 
     public List<MaterialInfo> getSingleModelElementMaterials(@NotNull Long fileId, @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
@@ -145,30 +149,17 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getSingleModelElementMaterials(fileId, elementId, accessToken));
     }
 
-    public List<Bar> getSingleModelElementBars(@NotNull Long fileId, @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelElementBars(fileId, elementId, accessToken));
-    }
-
-    public List<Quantity> getSingleModelElementQuantities(@NotNull Long fileId, @NotNull String elementId,
-                                                          String type, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelElementQuantities(fileId, elementId, type, accessToken));
-    }
-
-    public List<AggregatedQuantity> getSingleModelAggregatedElementQuantities(@NotNull Long fileId, List<String> elementIds, String type, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelAggregatedElementQuantities(fileId, elementIds, type, accessToken));
-    }
-
     public List<View> getSingleModelViews(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(dataClient.getSingleModelViews(fileId, accessToken));
     }
 
-    public List<Room> getSingleModelRooms(@NotNull Long fileId, @NotNull String floorId, @NotNull String accessToken) throws BimfaceException {
+    public List<Room> getSingleModelRooms(@NotNull Long fileId, String floorId, String elementId,
+                                          ToleranceType roomToleranceZ, ToleranceType roomToleranceXY,
+                                          @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelRooms(fileId, floorId, accessToken));
+        return executeCall(dataClient.getSingleModelRooms(fileId, floorId, elementId, roomToleranceZ, roomToleranceXY,
+                accessToken));
     }
 
     public Room getSingleModelRoom(@NotNull Long fileId, @NotNull String roomId, @NotNull String accessToken) throws BimfaceException {
@@ -209,9 +200,9 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getSingleModelLinks(fileId, accessToken));
     }
 
-    public List<DrawingSheet> getSingleModelDrawingSheets(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+    public List<DrawingSheet> getSingleModelDrawingSheets(@NotNull Long fileId, String elementId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getSingleModelDrawingSheets(fileId, accessToken));
+        return executeCall(dataClient.getSingleModelDrawingSheets(fileId, elementId, accessToken));
     }
 
     public Object getSingleModelModelInfo(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
@@ -224,36 +215,52 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getSingleModelChildElementIds(fileId, elementId, accessToken));
     }
 
+    public String updateSingleModelElementProperties(@NotNull Long fileId, @NotNull String elementId, List<PropertyGroup> propertyGroups, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.updateSingleModelElementProperties(fileId, elementId, propertyGroups, accessToken));
+    }
 
-    public ElementsWithBoundingBox getIntegrateModelElementIds(@NotNull Long integrateId, String specialty, String roomId,
-                                                               String floor, String categoryId, String family, String familyType, String systemType,
+    public String deleteSingleModelElementProperties(@NotNull Long fileId, @NotNull String elementId, List<PropertyGroup> propertyGroups, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.deleteSingleModelElementProperties(fileId, elementId, propertyGroups, accessToken));
+    }
+
+    public ElementsWithBoundingBox getIntegrateModelElementIds(@NotNull Long integrateId,
+                                                               @NotNull QueryElementIdsRequest queryElementIdsRequest,
                                                                @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelElementIds(integrateId, specialty, roomId, floor, categoryId, family,
-                familyType, systemType, accessToken));
+        return executeCall(dataClient.getIntegrateModelElementIds(integrateId,
+                ConvertUtils.convertToParamsMap(queryElementIdsRequest), accessToken));
     }
 
-    public List<Floor> getIntegrateModelFloors(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+    public String updateIntegrateModelElementProperties(@NotNull Long integrateId, @NotNull String fileIdHash,
+                                                        @NotNull String elementId, List<PropertyGroup> propertyGroups,
+                                                        @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelFloors(integrateId, accessToken));
+        return executeCall(dataClient.updateIntegrateModelElementProperties(integrateId, fileIdHash, elementId, propertyGroups, accessToken));
     }
 
-    public Property getIntegrateModelElement(@NotNull Long integrateId, @NotNull Long fileId,
-                                             @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
+    public String deleteIntegrateModelElementProperties(@NotNull Long integrateId, @NotNull String fileIdHash,
+                                                        @NotNull String elementId, List<PropertyGroup> propertyGroups,
+                                                        @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelElement(integrateId, fileId, elementId, accessToken));
+        return executeCall(dataClient.deleteIntegrateModelElementProperties(integrateId, fileIdHash, elementId, propertyGroups, accessToken));
+    }
+
+    public List<Floor> getIntegrateModelFloors(@NotNull Long integrateId, Boolean includeArea, Boolean includeRoom, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getIntegrateModelFloors(integrateId, includeArea, includeRoom, accessToken));
+    }
+
+    public Property getIntegrateModelElement(@NotNull Long integrateId, @NotNull String fileIdHash,
+                                             @NotNull String elementId, @NotNull Boolean includeOverrides, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getIntegrateModelElement(integrateId, fileIdHash, elementId, includeOverrides, accessToken));
     }
 
     public Property getIntegrateModelElement(@NotNull Long integrateId, @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(dataClient.getIntegrateModelElement(integrateId, elementId, accessToken));
-    }
-
-    public List<Property> getIntegrateModelElementProperties(@NotNull Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds,
-                                                             @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return fileIdHashWithElementIds != null ? executeCall(dataClient.getIntegrateModelElementProperties(integrateId, fileIdHashWithElementIds, accessToken)) :
-                executeCall(dataClient.getIntegrateModelElementProperties(integrateId, accessToken));
     }
 
     public List<MaterialInfo> getIntegrateModelElementMaterials(@NotNull Long integrateId, @NotNull String fileIdHash,
@@ -274,10 +281,12 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getIntegrateModelFileViews(integrateId, viewType, accessToken));
     }
 
-    public List<Room> getIntegrateModelRooms(@NotNull Long integrateId, @NotNull String floorId,
+    public List<Room> getIntegrateModelRooms(@NotNull Long integrateId, String floorId, String elementId,
+                                             ToleranceType roomToleranceZ, ToleranceType roomToleranceXY,
                                              @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelRooms(integrateId, floorId, accessToken));
+        return executeCall(dataClient.getIntegrateModelRooms(integrateId, floorId, elementId, roomToleranceZ,
+                roomToleranceXY, accessToken));
     }
 
     public Room getIntegrateModelRoom(@NotNull Long integrateId, @NotNull String roomId,
@@ -298,40 +307,9 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getIntegrateModelArea(integrateId, areaId, accessToken));
     }
 
-    public List<Quantity> getIntegrateModelElementQuantities(@NotNull Long integrateId, @NotNull Long fileId, @NotNull String elementId,
-                                                             String type, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelElementQuantities(integrateId, fileId, elementId, type, accessToken));
-    }
-
-    public List<Quantity> getIntegrateModelElementQuantities(@NotNull Long integrateId, @NotNull String elementId,
-                                                             String type, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelElementQuantities(integrateId, elementId, type, accessToken));
-    }
-
-    public List<AggregatedQuantity> getIntegrateModelAccumulativeQuantities(@NotNull Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds,
-                                                                            String type, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        if (fileIdHashWithElementIds != null)
-            return executeCall(dataClient.getIntegrateModelAccumulativeQuantities(integrateId, fileIdHashWithElementIds, type, accessToken));
-        else
-            return executeCall(dataClient.getIntegrateModelAccumulativeQuantities(integrateId, type, accessToken));
-    }
-
-    public List<IntegrateFile> getIntegrateFiles(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+    public List<IntegrateFileData> getIntegrateFiles(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(dataClient.getIntegrateFiles(integrateId, accessToken));
-    }
-
-    public List<Bar> getIntegrateModelElementBars(@NotNull Long integrateId, @NotNull Long fileId, @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelElementBars(integrateId, fileId, elementId, accessToken));
-    }
-
-    public List<Bar> getIntegrateModelElementBars(@NotNull Long integrateId, @NotNull String elementId, @NotNull String accessToken) throws BimfaceException {
-        accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelElementBars(integrateId, elementId, accessToken));
     }
 
     public String getIntegrateModelViewToken(@NotNull Long integrateId, @NotNull String fileId, @NotNull String accessToken) throws BimfaceException {
@@ -360,9 +338,9 @@ public class DataClient extends AbstractClient {
     }
 
     public Property getIntegrateModelCommonElementProperties(@NotNull Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds,
-                                                             @NotNull String accessToken) throws BimfaceException {
+                                                             @NotNull Boolean includeOverrides, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return fileIdHashWithElementIds != null ? executeCall(dataClient.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds, accessToken)) :
+        return fileIdHashWithElementIds != null ? executeCall(dataClient.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds, includeOverrides, accessToken)) :
                 executeCall(dataClient.getIntegrateModelCommonElementProperties(integrateId, accessToken));
     }
 
