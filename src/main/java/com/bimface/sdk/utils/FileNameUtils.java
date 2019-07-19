@@ -2,7 +2,7 @@ package com.bimface.sdk.utils;
 
 /**
  * 文件名称工具类
- * 
+ *
  * @author singo, 2016-08-27
  */
 public class FileNameUtils {
@@ -11,7 +11,7 @@ public class FileNameUtils {
 
     /**
      * 检查文件名称
-     * 
+     *
      * @param name 文件名
      */
     public static void checkFileName(String name) {
@@ -32,7 +32,7 @@ public class FileNameUtils {
 
     /**
      * 检查后缀名是否支持
-     * 
+     *
      * @param allSupportedType 支持的文件格式
      * @param name 文件名
      */
@@ -48,7 +48,7 @@ public class FileNameUtils {
 
     /**
      * 获取文件后缀名
-     * 
+     *
      * @param name 文件名
      * @return 文件后缀名
      */
@@ -65,7 +65,7 @@ public class FileNameUtils {
 
     /**
      * 判断是否包含非法字符
-     * 
+     *
      * @param value 值
      * @return 是否包含非法字符
      */

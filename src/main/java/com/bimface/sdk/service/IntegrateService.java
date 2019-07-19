@@ -2,14 +2,17 @@ package com.bimface.sdk.service;
 
 
 import com.bimface.api.bean.request.integrate.FileIntegrateRequest;
+import com.bimface.api.bean.request.integrate.IntegrateQueryRequest;
 import com.bimface.api.bean.response.FileIntegrateBean;
+import com.bimface.api.bean.response.FileIntegrateDetailBean;
 import com.bimface.exception.BimfaceException;
+import com.bimface.page.PagedList;
 import com.bimface.sdk.client.ApiClient;
 import com.bimface.sdk.config.Endpoint;
 
 /**
  * 文件转换
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class IntegrateService{
@@ -24,7 +27,7 @@ public class IntegrateService{
 
     /**
      * 发起文件集成
-     * 
+     *
      * @param request 文件集成请求
      * @return {@link FileIntegrateBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -35,7 +38,7 @@ public class IntegrateService{
 
     /**
      * 获取集成模型的状态
-     * 
+     *
      * @param integrateId 集成id
      * @return {@link FileIntegrateBean}
      * @throws BimfaceException {@link BimfaceException}
@@ -43,7 +46,17 @@ public class IntegrateService{
     public FileIntegrateBean getIntegrate(Long integrateId) throws BimfaceException {
         return apiClient.getIntegrate(integrateId, accessTokenService.getAccessToken());
     }
-    
+
+    /**
+     * 批量获取集成模型的状态
+     * @param integrateQueryRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public PagedList<FileIntegrateDetailBean> getIntegrates(IntegrateQueryRequest integrateQueryRequest) throws BimfaceException {
+        return apiClient.getIntegrates(integrateQueryRequest, accessTokenService.getAccessToken());
+    }
+
     /**
      * 删除集成模型
      * @param integrateId 集成模型id

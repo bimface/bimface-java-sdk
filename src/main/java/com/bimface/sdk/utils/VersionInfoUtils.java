@@ -5,7 +5,7 @@ import java.util.Properties;
 
 /**
  * 版本工具
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class VersionInfoUtils {
@@ -27,8 +27,8 @@ public class VersionInfoUtils {
     public static String getDefaultUserAgent() {
         if (defaultUserAgent == null) {
             defaultUserAgent = USER_AGENT_PREFIX + "/" + getVersion() + "(" + System.getProperty("os.name") + "/"
-                               + System.getProperty("os.version") + "/" + System.getProperty("os.arch") + ";"
-                               + System.getProperty("java.version") + ")";
+                    + System.getProperty("os.version") + "/" + System.getProperty("os.arch") + ";"
+                    + System.getProperty("java.version") + ")";
         }
         return defaultUserAgent;
     }

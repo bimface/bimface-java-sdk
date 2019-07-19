@@ -9,12 +9,12 @@ import com.bimface.sdk.config.authorization.Credential;
 
 /**
  * 获取AccessToken
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class AccessTokenService {
     private Credential         credential;
-    private AccessTokenStorage accessTokenStorage;
+    private volatile AccessTokenStorage accessTokenStorage;
     private ApiClient apiClient;
 
     public AccessTokenService(Endpoint endpoint, Credential credential,

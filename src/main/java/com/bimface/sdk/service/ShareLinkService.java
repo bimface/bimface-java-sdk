@@ -1,7 +1,9 @@
 package com.bimface.sdk.service;
 
+import com.bimface.api.bean.compatible.response.BatchDeleteResultBean;
 import com.bimface.api.bean.compatible.response.ShareLinkBean;
 import com.bimface.exception.BimfaceException;
+import com.bimface.page.PagedList;
 import com.bimface.sdk.client.ApiClient;
 import com.bimface.sdk.config.Endpoint;
 
@@ -9,7 +11,7 @@ import java.util.List;
 
 /**
  * 分享链接
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class ShareLinkService {
@@ -23,7 +25,7 @@ public class ShareLinkService {
 
     /**
      * 创建单文件模型的分享链接
-     * 
+     *
      * @param fileId 文件Id
      * @param activeHours 有效时长（单位：小时）
      * @return {@link ShareLinkBean}
@@ -119,7 +121,7 @@ public class ShareLinkService {
      * @return
      * @throws BimfaceException
      */
-    public String batchDeteleShare(List<Long> sourceIds) throws BimfaceException{
+    public BatchDeleteResultBean<Long> batchDeteleShare(List<Long> sourceIds) throws BimfaceException{
         return apiClient.batchDeteleShare(sourceIds, accessTokenService.getAccessToken());
     }
 
@@ -158,7 +160,7 @@ public class ShareLinkService {
      * @return
      * @throws BimfaceException
      */
-    public List<ShareLinkBean> shareList() throws BimfaceException{
-        return apiClient.shareList(accessTokenService.getAccessToken());
+    public PagedList<ShareLinkBean> shareList(Integer pageNo, Integer pageSize) throws BimfaceException{
+        return apiClient.shareList(accessTokenService.getAccessToken(),pageNo, pageSize);
     }
 }

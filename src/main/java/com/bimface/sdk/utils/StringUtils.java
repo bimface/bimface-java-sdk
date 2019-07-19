@@ -6,7 +6,7 @@ import com.bimface.sdk.constants.BimfaceConstants;
 
 /**
  * 字符串工具
- * 
+ *
  * @author bimface, 2016-06-01.
  */
 public class StringUtils {

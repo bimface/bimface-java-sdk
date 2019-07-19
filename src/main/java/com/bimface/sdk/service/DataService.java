@@ -1,9 +1,13 @@
 package com.bimface.sdk.service;
 
 import com.bimface.data.bean.*;
+import com.bimface.data.enums.ToleranceType;
 import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.bean.request.QueryElementIdsRequest;
 import com.bimface.sdk.client.DataClient;
 import com.bimface.sdk.config.Endpoint;
+import com.bimface.sdk.utils.AssertUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -36,8 +40,11 @@ public class DataService {
      * @return
      * @throws BimfaceException
      */
-    public List<Room> getSingleModelRooms(Long fileId, String floorId) throws BimfaceException {
-        return dataClient.getSingleModelRooms(fileId, floorId, accessTokenService.getAccessToken());
+    public List<Room> getSingleModelRooms(Long fileId, String floorId, String elementId, ToleranceType roomToleranceZ,
+                                          ToleranceType roomToleranceXY) throws BimfaceException {
+        AssertUtils.assertTrue(StringUtils.isNotBlank(floorId) || StringUtils.isNotBlank(elementId),
+                "floorId or elementId can't be both empty or blank");
+        return dataClient.getSingleModelRooms(fileId, floorId, elementId, roomToleranceZ, roomToleranceXY, accessTokenService.getAccessToken());
     }
 
     /**
@@ -114,12 +121,13 @@ public class DataService {
     /**
      * 单模型查询drawingSheets信息, v2
      *
-     * @param fileId
-     * @return
+     * @param fileId 文件ID
+     * @param elementId 构件ID
+     * @return 图纸列表
      * @throws BimfaceException
      */
-    public List<DrawingSheet> getSingleModelDrawingSheets(Long fileId) throws BimfaceException {
-        return dataClient.getSingleModelDrawingSheets(fileId, accessTokenService.getAccessToken());
+    public List<DrawingSheet> getSingleModelDrawingSheets(Long fileId, String elementId) throws BimfaceException {
+        return dataClient.getSingleModelDrawingSheets(fileId, elementId, accessTokenService.getAccessToken());
     }
 
     /**
@@ -146,36 +154,84 @@ public class DataService {
     }
 
     /**
-     * 获取集成模型构件ID组, v2
+     * 修改（包含添加和更新）构件基本属性组以外的属性, V2
      *
-     * @param integrateId
-     * @param specialty
-     * @param roomId
-     * @param floor
-     * @param categoryId
-     * @param family
-     * @param familyType
-     * @param systemType
+     * @param fileId
+     * @param elementId
+     * @param propertyGroups 更新的属性
      * @return
      * @throws BimfaceException
      */
-    public ElementsWithBoundingBox getIntegrateModelElementIds(Long integrateId, String specialty, String roomId,
-                                                               String floor, String categoryId, String family,
-                                                               String familyType, String systemType) throws BimfaceException {
-        return dataClient.getIntegrateModelElementIds(integrateId, specialty, roomId, floor, categoryId, family, familyType, systemType, accessTokenService.getAccessToken());
+    public String updateSingleModelElementProperties(Long fileId, String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataClient.updateSingleModelElementProperties(fileId, elementId, propertyGroups, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 删除构件基本属性组以外的属性, V2
+     *
+     * @param fileId
+     * @param elementId
+     * @param propertyGroups 删除的属性
+     * @return
+     * @throws BimfaceException
+     */
+    public String deleteSingleModelElementProperties(Long fileId, String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataClient.deleteSingleModelElementProperties(fileId, elementId, propertyGroups, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 获取集成模型构件ID组, v2
+     *
+     * @param integrateId
+     * @param queryElementIdsRequest
+     * @return
+     * @throws BimfaceException
+     */
+    public ElementsWithBoundingBox getIntegrateModelElementIds(Long integrateId, QueryElementIdsRequest queryElementIdsRequest) throws BimfaceException {
+        return dataClient.getIntegrateModelElementIds(integrateId, queryElementIdsRequest, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 修改集成模型指定构件的属性 V2
+     *
+     * @param integrateId
+     * @param fileIdHash
+     * @param elementId
+     * @param propertyGroups
+     * @return
+     * @throws BimfaceException
+     */
+    public String updateIntegrateModelElementProperties(Long integrateId, String fileIdHash,
+                                                        String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataClient.updateIntegrateModelElementProperties(integrateId, fileIdHash, elementId, propertyGroups, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 删除集成模型指定构件的属性 V2
+     *
+     * @param integrateId
+     * @param fileIdHash
+     * @param elementId
+     * @param propertyGroups
+     * @return
+     * @throws BimfaceException
+     */
+    public String deleteIntegrateModelElementProperties(Long integrateId, String fileIdHash,
+                                                        String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
+        return dataClient.deleteIntegrateModelElementProperties(integrateId, fileIdHash, elementId, propertyGroups, accessTokenService.getAccessToken());
     }
 
     /**
      * 获取集成模型构件, v2
      *
      * @param integrateId
-     * @param fileId
+     * @param fileIdHash
      * @param elementId
      * @return
      * @throws BimfaceException
      */
-    public Property getIntegrateModelElement(Long integrateId, Long fileId, String elementId) throws BimfaceException {
-        return dataClient.getIntegrateModelElement(integrateId, fileId, elementId, accessTokenService.getAccessToken());
+    public Property getIntegrateModelElement(Long integrateId, String fileIdHash, String elementId, Boolean includeOverrides) throws BimfaceException {
+        return dataClient.getIntegrateModelElement(integrateId, fileIdHash, elementId, includeOverrides, accessTokenService.getAccessToken());
     }
 
     /**
@@ -188,18 +244,6 @@ public class DataService {
      */
     public Property getIntegrateModelElement(Long integrateId, String elementId) throws BimfaceException {
         return dataClient.getIntegrateModelElement(integrateId, elementId, accessTokenService.getAccessToken());
-    }
-
-    /**
-     * 获取集成模型构件属性, v2
-     *
-     * @param integrateId
-     * @param fileIdHashWithElementIds {@link FileIdHashWithElementIds}
-     * @return {@link Property}
-     * @throws BimfaceException
-     */
-    public List<Property> getIntegrateModelElementProperties(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds) throws BimfaceException {
-        return dataClient.getIntegrateModelElementProperties(integrateId, fileIdHashWithElementIds, accessTokenService.getAccessToken());
     }
 
     /**
@@ -250,8 +294,12 @@ public class DataService {
      * @return
      * @throws BimfaceException
      */
-    public List<Room> getIntegrateModelRooms(Long integrateId, String floorId) throws BimfaceException {
-        return dataClient.getIntegrateModelRooms(integrateId, floorId, accessTokenService.getAccessToken());
+    public List<Room> getIntegrateModelRooms(Long integrateId, String floorId, String elementId, ToleranceType roomToleranceZ,
+                                             ToleranceType roomToleranceXY) throws BimfaceException {
+        AssertUtils.assertTrue(StringUtils.isNotBlank(floorId) || StringUtils.isNotBlank(elementId),
+                "floorId or elementId can't be both empty or blank");
+        return dataClient.getIntegrateModelRooms(integrateId, floorId, elementId, roomToleranceZ,
+                roomToleranceXY, accessTokenService.getAccessToken());
     }
 
     /**
@@ -291,80 +339,14 @@ public class DataService {
     }
 
     /**
-     * 集成模型查询构件工程量, v2
-     *
-     * @param integrateId
-     * @param fileId
-     * @param elementId
-     * @param type
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Quantity> getIntegrateModelElementQuantities(Long integrateId, Long fileId, String elementId, String type) throws BimfaceException {
-        return dataClient.getIntegrateModelElementQuantities(integrateId, fileId, elementId, type, accessTokenService.getAccessToken());
-    }
-
-    /**
-     * 集成模型查询构件工程量, v2
-     *
-     * @param integrateId
-     * @param elementId
-     * @param type
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Quantity> getIntegrateModelElementQuantities(Long integrateId, String elementId, String type) throws BimfaceException {
-        return dataClient.getIntegrateModelElementQuantities(integrateId, elementId, type, accessTokenService.getAccessToken());
-    }
-
-    /**
-     * 查询集成模型构件的汇总工程量, v2
-     *
-     * @param integrateId
-     * @param fileIdHashWithElementIds
-     * @param type
-     * @return
-     * @throws BimfaceException
-     */
-    public List<AggregatedQuantity> getIntegrateModelAccumulativeQuantities(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds, String type) throws BimfaceException {
-        return dataClient.getIntegrateModelAccumulativeQuantities(integrateId, fileIdHashWithElementIds, type, accessTokenService.getAccessToken());
-    }
-
-    /**
      * 查询指定的集成模型内参与集成的子文件信息, v2
      *
      * @param integrateId
      * @return
      * @throws BimfaceException
      */
-    public List<IntegrateFile> getIntegrateFiles(Long integrateId) throws BimfaceException {
+    public List<IntegrateFileData> getIntegrateFiles(Long integrateId) throws BimfaceException {
         return dataClient.getIntegrateFiles(integrateId, accessTokenService.getAccessToken());
-    }
-
-
-    /**
-     * 查询集成模型钢筋量，v2
-     *
-     * @param integrateId
-     * @param fileId
-     * @param elementId
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Bar> getIntegrateModelElementBars(Long integrateId, Long fileId, String elementId) throws BimfaceException {
-        return dataClient.getIntegrateModelElementBars(integrateId, fileId, elementId, accessTokenService.getAccessToken());
-    }
-
-    /**
-     * 查询集成模型钢筋量，v2
-     *
-     * @param integrateId
-     * @param elementId
-     * @return
-     * @throws BimfaceException
-     */
-    public List<Bar> getIntegrateModelElementBars(Long integrateId, String elementId) throws BimfaceException {
-        return dataClient.getIntegrateModelElementBars(integrateId, elementId, accessTokenService.getAccessToken());
     }
 
     /**
@@ -433,8 +415,8 @@ public class DataService {
      * @return
      * @throws BimfaceException
      */
-    public Property getIntegrateModelCommonElementProperties(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds) throws BimfaceException {
-        return dataClient.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds, accessTokenService.getAccessToken());
+    public Property getIntegrateModelCommonElementProperties(Long integrateId, List<FileIdHashWithElementIds> fileIdHashWithElementIds, Boolean includeOverrides) throws BimfaceException {
+        return dataClient.getIntegrateModelCommonElementProperties(integrateId, fileIdHashWithElementIds, includeOverrides, accessTokenService.getAccessToken());
     }
 
     /**
@@ -462,7 +444,7 @@ public class DataService {
      * @return
      * @throws BimfaceException
      */
-    public List<ElementBusinessAssociation> getAssociationsByElementId(String integrateId,String elementId, String businessType,
+    public List<ElementBusinessAssociation> getAssociationsByElementId(String integrateId, String elementId, String businessType,
                                                                        String businessFlag) throws BimfaceException {
         return dataClient.getAssociationsByElementId(integrateId, elementId, businessType, businessFlag, accessTokenService.getAccessToken());
     }
@@ -497,6 +479,7 @@ public class DataService {
 
     /**
      * 删除业务ID关联的业务挂接
+     *
      * @param integrateId
      * @param businessType
      * @param businessId
