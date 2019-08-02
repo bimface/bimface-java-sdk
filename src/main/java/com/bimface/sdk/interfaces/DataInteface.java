@@ -306,6 +306,9 @@ public interface DataInteface {
     Call<RESTResponse<List<PropertyValuesResp>>> getPropertyValues(@Query("targetIds") List<String> targetIds, @Query("targetType") String targetType,
                                                                    @Query("properties") List<String> properties, @Header("Authorization") String accessToken);
 
+    @GET("v2/query/paginationContextId")
+    Call<RESTResponse<String>> getPaginationContextId(@Header("Authorization") String accessToken);
+
     @GET("v2/databag/thumbnail")
     Call<RESTResponse<String>> getFileThumbnailUrl(@Query("fileId") Long fileId, @Query("size") Integer size, @Header("Authorization") String accessToken);
 

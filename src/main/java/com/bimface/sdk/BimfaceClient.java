@@ -579,9 +579,7 @@ public class BimfaceClient {
      * @param compareElementRequest {@link CompareElementRequest}
      * @return {@link ModelCompareChange}
      * @throws BimfaceException {@link BimfaceException}
-     * @deprecated
      */
-    @Deprecated
     public ModelCompareChange getCompareElementDiff(CompareElementRequest compareElementRequest) throws BimfaceException {
         return compareService.getCompareElementDiff(compareElementRequest);
     }
@@ -1972,6 +1970,16 @@ public class BimfaceClient {
     public List<PropertyValuesResp> getPropertyValues(List<String> targetIds, String targetType,
                                                       List<String> properties) throws BimfaceException {
         return dataService.getPropertyValues(targetIds, targetType, properties);
+    }
+
+    /**
+     * 生成分页查询的ContextId
+     *
+     * @return
+     * @throws BimfaceException
+     */
+    public String getPaginationContextId() throws BimfaceException {
+        return dataService.getPaginationContextId();
     }
 
     /**
