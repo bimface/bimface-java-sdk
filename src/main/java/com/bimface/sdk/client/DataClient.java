@@ -447,6 +447,11 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getPropertyValues(targetIds, targetType, properties, accessToken));
     }
 
+    public String getPaginationContextId(@NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getPaginationContextId(accessToken));
+    }
+
     public String getFileThumbnailUrl(@NotNull Long fileId, @NotNull Integer size, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(dataClient.getFileThumbnailUrl(fileId, size, accessToken));

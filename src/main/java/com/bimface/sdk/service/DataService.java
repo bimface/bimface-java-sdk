@@ -653,6 +653,16 @@ public class DataService {
     }
 
     /**
+     * 生成分页查询的ContextId
+     *
+     * @return
+     * @throws BimfaceException
+     */
+    public String getPaginationContextId() throws BimfaceException {
+        return dataClient.getPaginationContextId(accessTokenService.getAccessToken());
+    }
+
+    /**
      * 获取缩略图url
      *
      * @param fileId
