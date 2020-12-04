@@ -10,10 +10,12 @@ import com.bimface.api.bean.request.modelCompare.ModelCompareRequest;
 import com.bimface.api.bean.request.translate.FileTranslateRequest;
 import com.bimface.api.bean.request.translate.TranslateQueryRequest;
 import com.bimface.api.bean.response.*;
+import com.bimface.api.bean.response.databagDerivative.DatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.IntegrateDatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.ModelCompareDatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.TranslateDatabagDerivativeBean;
 import com.bimface.page.PagedList;
+import com.bimface.sdk.bean.request.DatabagDerivativeRequest;
 import com.bimface.sdk.bean.response.AccessTokenBean;
 import com.glodon.paas.foundation.restclient.RESTResponse;
 import retrofit2.Call;
@@ -58,25 +60,40 @@ public interface ApiInterface {
 
 
     @PUT("files/{fileId}/offlineDatabag")
-    Call<RESTResponse<TranslateDatabagDerivativeBean>> createTranslateOfflineDatabag(@Path("fileId") Long fileId, @Query("callback") String callback,
+    Call<RESTResponse<TranslateDatabagDerivativeBean>> createTranslateOfflineDatabag(@Path("fileId") Long fileId,
+                                                                                     @Query("callback") String callback,
+                                                                                     @Body DatabagDerivativeRequest request,
                                                                                      @Header("Authorization") String accessToken);
 
     @PUT("integrations/{integrateId}/offlineDatabag")
-    Call<RESTResponse<IntegrateDatabagDerivativeBean>> createIntegateOfflineDatabag(@Path("integrateId") Long integrateId, @Query("callback") String callback,
+    Call<RESTResponse<IntegrateDatabagDerivativeBean>> createIntegateOfflineDatabag(@Path("integrateId") Long integrateId,
+                                                                                    @Query("callback") String callback,
+                                                                                    @Body DatabagDerivativeRequest request,
                                                                                     @Header("Authorization") String accessToken);
 
     @PUT("comparisions/{compareId}/offlineDatabag")
-    Call<RESTResponse<ModelCompareDatabagDerivativeBean>> createCompareOfflineDatabag(@Path("compareId") Long compareId, @Query("callback") String callback,
+    Call<RESTResponse<ModelCompareDatabagDerivativeBean>> createCompareOfflineDatabag(@Path("compareId") Long compareId,
+                                                                                      @Query("callback") String callback,
+                                                                                      @Body DatabagDerivativeRequest request,
                                                                                       @Header("Authorization") String accessToken);
 
     @GET("files/{fileId}/offlineDatabag")
     Call<RESTResponse<List<TranslateDatabagDerivativeBean>>> getTranslateOfflineDatabag(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
 
     @GET("integrations/{integrateId}/offlineDatabag")
-    Call<RESTResponse<List<IntegrateDatabagDerivativeBean>>> getIntegateOfflineDatabag(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<IntegrateDatabagDerivativeBean>>> getIntegrateOfflineDatabag(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
 
     @GET("comparisions/{compareId}/offlineDatabag")
     Call<RESTResponse<List<ModelCompareDatabagDerivativeBean>>> getCompareOfflineDatabag(@Path("compareId") Long compareId, @Header("Authorization") String accessToken);
+
+    @PUT("files/{fileId}/export/gltf")
+    Call<RESTResponse<TranslateDatabagDerivativeBean>> exportTranslateGltfDatabag(@Path("fileId") Long fileId,
+                                                                         @Query("callback") String callback,
+                                                                         @Header("Authorization") String accessToken);
+
+    @GET("files/{fileId}/export/gltf")
+    Call<RESTResponse<List<TranslateDatabagDerivativeBean>>> getTranslateGltfDatabag(@Path("fileId") Long fileId,
+                                                                            @Header("Authorization") String accessToken);
 
     @PUT("integrate")
     Call<RESTResponse<FileIntegrateBean>> integrate(@Body FileIntegrateRequest request, @Header("Authorization") String accessToken);
@@ -105,4 +122,45 @@ public interface ApiInterface {
     @DELETE("v2/compare")
     Call<RESTResponse<ModelCompareBean>> deleteModelCompareV2(@Query("compareId") Long compareId, @Header("Authorization") String accessToken);
 
+    @PUT("files/{fileId}/split")
+    Call<RESTResponse<TranslateDatabagDerivativeBean>> createDrawingSplit(@Path("fileId") Long fileId, @Query("callback") String callback,
+                                                                @Body DatabagDerivativeRequest request, @Header("Authorization") String accessToken);
+
+    @GET("files/{fileId}/split")
+    Call<RESTResponse<TranslateDatabagDerivativeBean>> getDrawingSplit(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @PUT("integrations/{integrateId}/export/gltf")
+    Call<RESTResponse<IntegrateDatabagDerivativeBean>> exportIntegrateGltfDatabag(@Path("integrateId") Long integrateId, @Query("callback") String callback,
+                                                                         @Header("Authorization") String accessToken);
+
+    @GET("integrations/{integrateId}/export/gltf")
+    Call<RESTResponse<List<IntegrateDatabagDerivativeBean>>> getIntegrateGltfDatabags(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+
+    @PUT("files/{fileId}/export/3dtiles")
+    Call<RESTResponse<TranslateDatabagDerivativeBean>> exportTranslate3DTilesDatabag(@Path("fileId") Long fileId, @Query("callback") String callback,
+                                                                            @Body DatabagDerivativeRequest request, @Header("Authorization") String accessToken);
+
+    @GET("files/{fileId}/export/3dtiles")
+    Call<RESTResponse<List<TranslateDatabagDerivativeBean>>> getTranslate3DTilesDatabags(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @PUT("integrations/{integrateId}/export/3dtiles")
+    Call<RESTResponse<IntegrateDatabagDerivativeBean>> exportIntegrate3DTilesDatabag(@Path("integrateId") Long integrateId, @Query("callback") String callback,
+                                                                            @Body DatabagDerivativeRequest request, @Header("Authorization") String accessToken);
+
+    @GET("integrations/{integrateId}/export/3dtiles")
+    Call<RESTResponse<List<IntegrateDatabagDerivativeBean>>> getIntegrate3DTilesDatabags(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+
+    @PUT("files/{fileId}/bake")
+    Call<RESTResponse<TranslateDatabagDerivativeBean>> createTranslateBakeDatabag(@Path("fileId") Long fileId, @Query("callback") String callback,
+                                                                         @Body DatabagDerivativeRequest request, @Header("Authorization") String accessToken);
+
+    @GET("files/{fileId}/bake")
+    Call<RESTResponse<List<TranslateDatabagDerivativeBean>>> getTranslateBakeDatabags(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @PUT("integrations/{integrateId}/bake")
+    Call<RESTResponse<IntegrateDatabagDerivativeBean>> createIntegrateBakeDatabag(@Path("integrateId") Long integrateId, @Query("callback") String callback,
+                                                                         @Body DatabagDerivativeRequest request, @Header("Authorization") String accessToken);
+
+    @GET("integrations/{integrateId}/bake")
+    Call<RESTResponse<List<IntegrateDatabagDerivativeBean>>> getIntegrateBakeDatabags(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
 }

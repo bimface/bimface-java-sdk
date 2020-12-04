@@ -60,7 +60,7 @@ public interface DataInteface {
 
     @GET("v2/files/{fileIds}/fileIdfloorsMappings")
     Call<RESTResponse<List<Map<String, Object>>>> getSingleModelFileIdFloorsMapping(@Path("fileIds") String fileIds, @Query("includeArea") Boolean includeArea,
-                                                                                    @Query("includeRoom") Boolean includeRoom, @Header("Authorization") String accessToken);
+                                                                              @Query("includeRoom") Boolean includeRoom, @Header("Authorization") String accessToken);
 
     @GET("v2/files/{fileId}/floors")
     Call<RESTResponse<List<Floor>>> getSingleModelFloors(@Path("fileId") Long fileId, @Query("includeArea") Boolean includeArea,
@@ -188,7 +188,7 @@ public interface DataInteface {
                                                                    @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/rooms")
-    Call<RESTResponse<List<Room>>> getIntegrateModelRooms(@Path("integrateId") Long integrateId, @Query("floorId") String floorId,
+    Call<RESTResponse<List<Room>>> getIntegrateModelRooms(@Path("integrateId") Long integrateId, @Query("floorId") String floorId, @Query("fileIdHash") String fileIdHash,
                                                           @Query("elementId") String elementId, @Query("roomToleranceZ") ToleranceType roomToleranceZ,
                                                           @Query("roomToleranceXY") ToleranceType roomToleranceXY, @Header("Authorization") String accessToken);
 
@@ -205,7 +205,8 @@ public interface DataInteface {
                                                    @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/files")
-    Call<RESTResponse<List<IntegrateFileData>>> getIntegrateFiles(@Path("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<IntegrateFileData>>> getIntegrateFiles(@Path("integrateId") Long integrateId, @Query("includeDrawingSheet") Boolean includeDrawingSheet,
+                                                                  @Header("Authorization") String accessToken);
 
     @GET("v2/integrations/{integrateId}/files/{fileId}/viewToken")
     Call<RESTResponse<String>> getIntegrateModelViewToken(@Path("integrateId") Long integrateId, @Path("fileId") String fileId, @Header("Authorization") String accessToken);
@@ -294,7 +295,9 @@ public interface DataInteface {
                                                                        @Header("Authorization") String accessToken);
 
     @POST("v2/query/elementIds")
-    Call<RESTResponse<List<SearchElementIdsResp>>> getElements(@Body String requestBody, @Header("Authorization") String accessToken);
+    Call<RESTResponse<List<SearchElementIdsResp>>> getElements(@Body String requestBody,
+                                                               @Query("includeOverrides") Boolean includeOverrides,
+                                                               @Header("Authorization") String accessToken);
 
     @POST("v2/query/roomIds")
     Call<RESTResponse<List<SearchRoomIdsResp>>> getRooms(@Body String requestBody, @Header("Authorization") String accessToken);
@@ -304,7 +307,8 @@ public interface DataInteface {
 
     @GET("v2/query/propertyValues")
     Call<RESTResponse<List<PropertyValuesResp>>> getPropertyValues(@Query("targetIds") List<String> targetIds, @Query("targetType") String targetType,
-                                                                   @Query("properties") List<String> properties, @Header("Authorization") String accessToken);
+                                                                   @Query("properties") List<String> properties, @Query("includeOverrides") Boolean includeOverrides,
+                                                                   @Header("Authorization") String accessToken);
 
     @GET("v2/query/paginationContextId")
     Call<RESTResponse<String>> getPaginationContextId(@Header("Authorization") String accessToken);
@@ -323,4 +327,20 @@ public interface DataInteface {
 
     @GET("v2/databag/rootUrl")
     Call<RESTResponse<String>> getIntegrateDatabagRootUrl(@Query("integrateId") Long integrateId, @Header("Authorization") String accessToken);
+
+    @GET("v2/files/{fileId}/frames")
+    Call<RESTResponse<List<DrawingSplitLayout>>> getDrawingFrames(@Path("fileId") Long fileId, @Header("Authorization") String accessToken);
+
+    @GET("v2/files/{fileId}/MEPSystem")
+    Call<RESTResponse<List<MEPSystem>>> getMEPSystem(@Path("fileId") Long fileId, @Query("systemCategory") String systemCategory,
+                                                     @Query("systemType") String systemType, @Header("Authorization") String accessToken);
+
+    @POST("integrations/{integrateId}/elements/boundingboxes")
+    Call<RESTResponse<List<ElementIdWithBoundingBox>>> getBoundingBoxes(@Path("integrateId") Long integrateId, @Body List<String> fileIdWithEleIdList,
+                                                                        @Header("Authorization") String accessToken);
+
+    @GET("v2/comparisons/{comparisonId}/drawingdiff")
+    Call<RESTResponse<Pagination<DrawingCompareDiff>>> pageGetDrawingCompareResult(@Path("comparisonId") Long comparisonId, @Query("layer") String layer,
+                                                                                   @Query("page") Integer page, @Query("pageSize") Integer pageSize,
+                                                                                   @Header("Authorization") String accessToken);
 }

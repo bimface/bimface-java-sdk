@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bimface</groupId>
     <artifactId>bimface-java-sdk</artifactId>
-    <version>3.2.4</version>
+    <version>3.2.5</version>
     <packaging>jar</packaging>
 
     <name>bimface</name>
@@ -19,13 +19,6 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <name>bimface</name>
-            <email>bimface@qq.com</email>
-        </developer>
-    </developers>
-
     <scm>
         <connection>scm:git:https://github.com/bimface/bimface-java-sdk.git</connection>
         <developerConnection>scm:git:https://github.com/bimface/bimface-java-sdk.git</developerConnection>
@@ -34,6 +27,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <finalName>${project.artifactId}</finalName>
     </properties>
 
     <dependencies>
@@ -247,13 +241,30 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <addMavenDescriptor>true</addMavenDescriptor>
+                            </archive>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <!-- shade -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
                         <version>3.1.0</version>
                         <configuration>
-                            <finalName>bimface-java-sdk</finalName>
+                            <finalName>${finalName}</finalName>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>all</shadedClassifierName>
                             <artifactSet>
@@ -274,7 +285,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-                <finalName>bimface-java-sdk</finalName>
+                <finalName>${finalName}</finalName>
             </build>
 
             <distributionManagement>
@@ -306,13 +317,30 @@
                             <encoding>${project.build.sourceEncoding}</encoding>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <addMavenDescriptor>true</addMavenDescriptor>
+                            </archive>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <!-- shade -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
                         <version>3.1.0</version>
                         <configuration>
-                            <finalName>bimface-java-sdk</finalName>
+                            <finalName>${finalName}</finalName>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>all</shadedClassifierName>
                             <artifactSet>
@@ -357,7 +385,7 @@
                         </executions>
                     </plugin>
                 </plugins>
-                <finalName>bimface-java-sdk</finalName>
+                <finalName>${finalName}</finalName>
             </build>
             <distributionManagement>
                 <repository>

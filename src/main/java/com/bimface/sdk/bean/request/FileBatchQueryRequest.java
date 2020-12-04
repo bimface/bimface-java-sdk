@@ -4,11 +4,6 @@ import com.bimface.file.enums.FileStatus;
 
 import java.time.LocalDate;
 
-/**
- * 文件批量查询的参数
- *
- * @author bimface 2109/07/19
- */
 public class FileBatchQueryRequest {
     private String suffix;
     private FileStatus status;

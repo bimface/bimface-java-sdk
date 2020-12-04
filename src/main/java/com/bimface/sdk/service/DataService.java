@@ -159,7 +159,7 @@ public class DataService {
      * @param fileId
      * @param elementId
      * @param propertyGroups 更新的属性
-     * @return
+     * @return 修改是否成功
      * @throws BimfaceException
      */
     public String updateSingleModelElementProperties(Long fileId, String elementId, List<PropertyGroup> propertyGroups) throws BimfaceException {
@@ -291,14 +291,18 @@ public class DataService {
      *
      * @param integrateId
      * @param floorId
+     * @param fileIdHash
+     * @param elementId
+     * @param roomToleranceZ
+     * @param roomToleranceXY
      * @return
      * @throws BimfaceException
      */
-    public List<Room> getIntegrateModelRooms(Long integrateId, String floorId, String elementId, ToleranceType roomToleranceZ,
+    public List<Room> getIntegrateModelRooms(Long integrateId, String floorId, String fileIdHash, String elementId, ToleranceType roomToleranceZ,
                                              ToleranceType roomToleranceXY) throws BimfaceException {
         AssertUtils.assertTrue(StringUtils.isNotBlank(floorId) || StringUtils.isNotBlank(elementId),
                 "floorId or elementId can't be both empty or blank");
-        return dataClient.getIntegrateModelRooms(integrateId, floorId, elementId, roomToleranceZ,
+        return dataClient.getIntegrateModelRooms(integrateId, floorId, fileIdHash, elementId, roomToleranceZ,
                 roomToleranceXY, accessTokenService.getAccessToken());
     }
 
@@ -342,11 +346,12 @@ public class DataService {
      * 查询指定的集成模型内参与集成的子文件信息, v2
      *
      * @param integrateId
+     * @param includeDrawingSheet
      * @return
      * @throws BimfaceException
      */
-    public List<IntegrateFileData> getIntegrateFiles(Long integrateId) throws BimfaceException {
-        return dataClient.getIntegrateFiles(integrateId, accessTokenService.getAccessToken());
+    public List<IntegrateFileData> getIntegrateFiles(Long integrateId, Boolean includeDrawingSheet) throws BimfaceException {
+        return dataClient.getIntegrateFiles(integrateId, includeDrawingSheet, accessTokenService.getAccessToken());
     }
 
     /**
@@ -608,12 +613,13 @@ public class DataService {
      * 查询elementId
      *
      * @param requestBody
+     * @param includeOverrides
      * @return
      * @throws BimfaceException
      */
-    public List<SearchElementIdsResp> getElements(String requestBody) throws BimfaceException {
+    public List<SearchElementIdsResp> getElements(String requestBody, Boolean includeOverrides) throws BimfaceException {
 
-        return dataClient.getElements(requestBody, accessTokenService.getAccessToken());
+        return dataClient.getElements(requestBody, includeOverrides, accessTokenService.getAccessToken());
     }
 
     /**
@@ -644,12 +650,13 @@ public class DataService {
      * @param targetIds
      * @param targetType
      * @param properties
+     * @param includeOverrides
      * @return
      * @throws BimfaceException
      */
     public List<PropertyValuesResp> getPropertyValues(List<String> targetIds, String targetType,
-                                                      List<String> properties) throws BimfaceException {
-        return dataClient.getPropertyValues(targetIds, targetType, properties, accessTokenService.getAccessToken());
+                                                      List<String> properties, Boolean includeOverrides) throws BimfaceException {
+        return dataClient.getPropertyValues(targetIds, targetType, properties, includeOverrides, accessTokenService.getAccessToken());
     }
 
     /**
@@ -695,5 +702,44 @@ public class DataService {
      */
     public String getDwgPreviewImageUrl(Long dwgFileId, String layoutName) throws BimfaceException {
         return dataClient.getDwgPreviewImageUrl(dwgFileId, layoutName, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 获取MEP系统信息
+     * @param fileId
+     * @param systemCategory
+     * @param systemType
+     * @return
+     * @throws BimfaceException
+     */
+    public List<MEPSystem> getMEPSystem(Long fileId, String systemCategory, String systemType) throws BimfaceException {
+        AssertUtils.assertParameterNotNull(fileId, "fileId");
+        return dataClient.getMEPSystem(fileId, systemCategory, systemType, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 获取指定构件列表的包围盒列表
+     * @param integrateId
+     * @param fileIdWithEleIdList
+     * @return
+     * @throws BimfaceException
+     */
+    public List<ElementIdWithBoundingBox> getBoundingBoxes(Long integrateId, List<String> fileIdWithEleIdList) throws BimfaceException {
+        AssertUtils.assertParameterNotNull(integrateId, "integrateId");
+        return dataClient.getBoundingBoxes(integrateId, fileIdWithEleIdList, accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 分页获取图纸对比结果
+     * @param comparisonId
+     * @param layer
+     * @param page
+     * @param pageSize
+     * @return
+     * @throws BimfaceException
+     */
+    public Pagination<DrawingCompareDiff> pageGetDrawingCompareResult(Long comparisonId, String layer, Integer page, Integer pageSize) throws BimfaceException {
+        AssertUtils.assertParameterNotNull(comparisonId, "comparisonId");
+        return dataClient.pageGetDrawingCompareResult(comparisonId, layer, page, pageSize, accessTokenService.getAccessToken());
     }
 }
