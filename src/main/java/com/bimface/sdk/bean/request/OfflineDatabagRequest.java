@@ -1,5 +1,7 @@
 package com.bimface.sdk.bean.request;
 
+import java.util.Map;
+
 /**
  * 离线数据包请求参数
  * 
@@ -11,6 +13,7 @@ public class OfflineDatabagRequest {
     private Long      integrateId;    // 集成ID，三个参数只能选其一
     private Long      compareId;      // 对比ID，三个参数只能选其一
     private String    callback;       // 回调URL
+    private Map<String, String> config; // 创建离线数据包的参数
     private String    databagVersion; // 离线数据包版本，如果只有一个，则下载唯一的数据包，如果多个，则必须指定数据包版本
 
     public Long getFileId() {
@@ -55,6 +58,14 @@ public class OfflineDatabagRequest {
 
     public OfflineDatabagRequest() {
         super();
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
+    }
+
+    public void setConfig(Map<String, String> config) {
+        this.config = config;
     }
 
     public OfflineDatabagRequest(Long fileId, Long integrateId, Long compareId, String callback, String databagVersion) {

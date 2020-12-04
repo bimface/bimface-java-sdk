@@ -5,7 +5,7 @@ import com.bimface.data.enums.ToleranceType;
 /**
  * 查询满足条件的构件ID列表的请求参数
  *
- * @author bimface 2019/07/19
+ * @author bimface
  */
 public class QueryElementIdsRequest {
     private String specialty;

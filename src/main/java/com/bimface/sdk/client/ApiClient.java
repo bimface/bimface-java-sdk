@@ -10,12 +10,14 @@ import com.bimface.api.bean.request.modelCompare.ModelCompareRequest;
 import com.bimface.api.bean.request.translate.FileTranslateRequest;
 import com.bimface.api.bean.request.translate.TranslateQueryRequest;
 import com.bimface.api.bean.response.*;
+import com.bimface.api.bean.response.databagDerivative.DatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.IntegrateDatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.ModelCompareDatabagDerivativeBean;
 import com.bimface.api.bean.response.databagDerivative.TranslateDatabagDerivativeBean;
 import com.bimface.exception.BimfaceException;
 import com.bimface.http.BimfaceResponseChecker;
 import com.bimface.page.PagedList;
+import com.bimface.sdk.bean.request.DatabagDerivativeRequest;
 import com.bimface.sdk.bean.response.AccessTokenBean;
 import com.bimface.sdk.config.authorization.Credential;
 import com.bimface.sdk.interfaces.ApiInterface;
@@ -100,6 +102,9 @@ public class ApiClient extends AbstractClient {
                 (fileId != null && integrateId != null)) {
             throw new IllegalArgumentException("one and only one argument can be not null in (fileId, integrateId)");
         }
+        if (activeDurationInHours != null && !StringUtils.isNullOrEmpty(expireDate)) {
+            throw new IllegalArgumentException("only one argument can be not null in (activeDurationInHours, expireDate)");
+        }
         if (activeDurationInHours != null && activeDurationInHours < 0) {
             throw new IllegalArgumentException("activeDurationInHours can not be negative");
         }
@@ -135,19 +140,22 @@ public class ApiClient extends AbstractClient {
         return executeCall(apiClient.shareList(accessToken, pageNo, pageSize));
     }
 
-    public TranslateDatabagDerivativeBean createTranslateOfflineDatabag(@NotNull Long fileId, String callback, @NotNull String accessToken) throws BimfaceException {
+    public TranslateDatabagDerivativeBean createTranslateOfflineDatabag(@NotNull Long fileId, String callback,
+                                                                        DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(apiClient.createTranslateOfflineDatabag(fileId, callback, accessToken));
+        return executeCall(apiClient.createTranslateOfflineDatabag(fileId, callback, request, accessToken));
     }
 
-    public IntegrateDatabagDerivativeBean createIntegateOfflineDatabag(@NotNull Long integrateId, String callback, @NotNull String accessToken) throws BimfaceException {
+    public IntegrateDatabagDerivativeBean createIntegateOfflineDatabag(@NotNull Long integrateId, String callback,
+                                                                        DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(apiClient.createIntegateOfflineDatabag(integrateId, callback, accessToken));
+        return executeCall(apiClient.createIntegateOfflineDatabag(integrateId, callback, request, accessToken));
     }
 
-    public ModelCompareDatabagDerivativeBean createCompareOfflineDatabag(@NotNull Long compareId, String callback, @NotNull String accessToken) throws BimfaceException {
+    public ModelCompareDatabagDerivativeBean createCompareOfflineDatabag(@NotNull Long compareId, String callback,
+                                                                        DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(apiClient.createCompareOfflineDatabag(compareId, callback, accessToken));
+        return executeCall(apiClient.createCompareOfflineDatabag(compareId, callback, request, accessToken));
     }
 
     public List<TranslateDatabagDerivativeBean> getTranslateOfflineDatabag(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
@@ -155,14 +163,24 @@ public class ApiClient extends AbstractClient {
         return executeCall(apiClient.getTranslateOfflineDatabag(fileId, accessToken));
     }
 
-    public List<IntegrateDatabagDerivativeBean> getIntegateOfflineDatabag(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+    public List<IntegrateDatabagDerivativeBean> getIntegrateOfflineDatabag(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(apiClient.getIntegateOfflineDatabag(integrateId, accessToken));
+        return executeCall(apiClient.getIntegrateOfflineDatabag(integrateId, accessToken));
     }
 
     public List<ModelCompareDatabagDerivativeBean> getCompareOfflineDatabag(@NotNull Long compareId, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(apiClient.getCompareOfflineDatabag(compareId, accessToken));
+    }
+
+    public TranslateDatabagDerivativeBean exportTranslateGltfDatabag(Long fileId, String callback, String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.exportTranslateGltfDatabag(fileId, callback, accessToken));
+    }
+
+    public List<TranslateDatabagDerivativeBean> getTranslateGltfDatabag(Long fileId, String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getTranslateGltfDatabag(fileId, accessToken));
     }
 
     public FileIntegrateBean integrate(@NotNull FileIntegrateRequest request, @NotNull String accessToken) throws BimfaceException {
@@ -210,4 +228,69 @@ public class ApiClient extends AbstractClient {
         executeCall(apiClient.deleteModelCompareV2(compareId, accessToken));
     }
 
+    public TranslateDatabagDerivativeBean createDrawingSplit(@NotNull Long fileId, String callback,
+                                                    DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.createDrawingSplit(fileId, callback, request, accessToken));
+    }
+
+    public TranslateDatabagDerivativeBean getDrawingSplit(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getDrawingSplit(fileId, accessToken));
+    }
+
+    public IntegrateDatabagDerivativeBean exportIntegrateGltfDatabag(@NotNull Long integrateId, String callback,
+                                                            @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.exportIntegrateGltfDatabag(integrateId, callback, accessToken));
+    }
+
+    public List<IntegrateDatabagDerivativeBean> getIntegrateGltfDatabags(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getIntegrateGltfDatabags(integrateId, accessToken));
+    }
+
+    public TranslateDatabagDerivativeBean exportTranslate3DTilesDatabag(@NotNull Long fileId, String callback,
+                                                               DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.exportTranslate3DTilesDatabag(fileId, callback, request, accessToken));
+    }
+
+    public List<TranslateDatabagDerivativeBean> getTranslate3DTilesDatabags(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getTranslate3DTilesDatabags(fileId, accessToken));
+    }
+
+    public IntegrateDatabagDerivativeBean exportIntegrate3DTilesDatabag(@NotNull Long integrateId, String callback,
+                                                               DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.exportIntegrate3DTilesDatabag(integrateId, callback, request, accessToken));
+    }
+
+    public List<IntegrateDatabagDerivativeBean> getIntegrate3DTilesDatabags(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getIntegrate3DTilesDatabags(integrateId, accessToken));
+    }
+
+    public TranslateDatabagDerivativeBean createTranslateBakeDatabag(@NotNull Long fileId, String callback,
+                                                            DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.createTranslateBakeDatabag(fileId, callback, request, accessToken));
+    }
+
+    public List<TranslateDatabagDerivativeBean> getTranslateBakeDatabags(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getTranslateBakeDatabags(fileId, accessToken));
+    }
+
+    public IntegrateDatabagDerivativeBean createIntegrateBakeDatabag(@NotNull Long integrateId, String callback,
+                                                            DatabagDerivativeRequest request, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.createIntegrateBakeDatabag(integrateId, callback, request, accessToken));
+    }
+
+    public List<IntegrateDatabagDerivativeBean> getIntegrateBakeDatabags(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(apiClient.getIntegrateBakeDatabags(integrateId, accessToken));
+    }
 }

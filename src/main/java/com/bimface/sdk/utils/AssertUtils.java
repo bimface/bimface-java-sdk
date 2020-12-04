@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  * 参数校验
- *
+ * 
  * @author bimface, 2016-06-01.
  */
 public class AssertUtils {
@@ -72,7 +72,7 @@ public class AssertUtils {
 
         if (length > maxLength) {
             throw new IllegalArgumentException("file length is larger:" + length + "than supported length :"
-                    + maxLength);
+                                               + maxLength);
         }
     }
 

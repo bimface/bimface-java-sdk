@@ -126,15 +126,15 @@ public class FileService {
             }
         }
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("key",
-                policy.getObjectKey()).addFormDataPart("success_action_status",
-                "200").addFormDataPart("Content-Disposition",
-                "attachment;filename=" + name).addFormDataPart("OSSAccessKeyId",
-                policy.getAccessId()).addFormDataPart("policy",
-                policy.getPolicy()).addFormDataPart("Signature",
-                policy.getSignature()).addFormDataPart("callback",
-                policy.getCallbackBody()).addFormDataPart("file",
-                name,
-                RESTStreamRequestBody.create(MediaType.parse(BimfaceConstants.STREAM_MIME), contentLength, inputStream)).build();
+                                                                                              policy.getObjectKey()).addFormDataPart("success_action_status",
+                                                                                                                                     "200").addFormDataPart("Content-Disposition",
+                                                                                                                                                            "attachment;filename=" + name).addFormDataPart("OSSAccessKeyId",
+                                                                                                                                                                                                           policy.getAccessId()).addFormDataPart("policy",
+                                                                                                                                                                                                                                                 policy.getPolicy()).addFormDataPart("Signature",
+                                                                                                                                                                                                                                                                                     policy.getSignature()).addFormDataPart("callback",
+                                                                                                                                                                                                                                                                                                                            policy.getCallbackBody()).addFormDataPart("file",
+                                                                                                                                                                                                                                                                                                                                                                      name,
+                                                                                                                                                                                                                                                                                                                                                                      RESTStreamRequestBody.create(MediaType.parse(BimfaceConstants.STREAM_MIME), contentLength, inputStream)).build();
         return fileClient.uploadByPolicy(policy.getHost(), body);
     }
 

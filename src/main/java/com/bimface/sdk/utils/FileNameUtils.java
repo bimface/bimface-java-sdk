@@ -32,14 +32,14 @@ public class FileNameUtils {
 
     /**
      * 检查后缀名是否支持
-     *
+     * 
      * @param allSupportedType 支持的文件格式
      * @param name 文件名
      */
     public static void checkFileType(String[] allSupportedType, String name) {
         String suffix = getSuffix(name);
         for (String s : allSupportedType) {
-            if (s.equalsIgnoreCase(suffix)) {
+            if ("*".equalsIgnoreCase(s) || s.equalsIgnoreCase(suffix)) {
                 return;
             }
         }

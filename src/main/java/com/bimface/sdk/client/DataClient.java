@@ -118,7 +118,7 @@ public class DataClient extends AbstractClient {
     }
 
     public List<Map<String, Object>> getSingleModelFileIdFloorsMapping(@NotNull List<String> fileIds, Boolean includeArea,
-                                                                       Boolean includeRoom, @NotNull String accessToken) throws BimfaceException {
+                                                                 Boolean includeRoom, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         String fileIdsList = fileIds.stream().reduce((i,j)->i+","+j).orElse(null);
         return executeCall(dataClient.getSingleModelFileIdFloorsMapping(fileIdsList, includeArea, includeRoom, accessToken));
@@ -281,11 +281,11 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getIntegrateModelFileViews(integrateId, viewType, accessToken));
     }
 
-    public List<Room> getIntegrateModelRooms(@NotNull Long integrateId, String floorId, String elementId,
+    public List<Room> getIntegrateModelRooms(@NotNull Long integrateId, String floorId, String fileIdHash, String elementId,
                                              ToleranceType roomToleranceZ, ToleranceType roomToleranceXY,
                                              @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateModelRooms(integrateId, floorId, elementId, roomToleranceZ,
+        return executeCall(dataClient.getIntegrateModelRooms(integrateId, floorId, fileIdHash, elementId, roomToleranceZ,
                 roomToleranceXY, accessToken));
     }
 
@@ -307,9 +307,9 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getIntegrateModelArea(integrateId, areaId, accessToken));
     }
 
-    public List<IntegrateFileData> getIntegrateFiles(@NotNull Long integrateId, @NotNull String accessToken) throws BimfaceException {
+    public List<IntegrateFileData> getIntegrateFiles(@NotNull Long integrateId, Boolean includeDrawingSheet, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getIntegrateFiles(integrateId, accessToken));
+        return executeCall(dataClient.getIntegrateFiles(integrateId, includeDrawingSheet, accessToken));
     }
 
     public String getIntegrateModelViewToken(@NotNull Long integrateId, @NotNull String fileId, @NotNull String accessToken) throws BimfaceException {
@@ -426,9 +426,9 @@ public class DataClient extends AbstractClient {
         return executeCall(dataClient.getRfaFamilyTypeProperty(rfaFileId, familyTypeGuid, accessToken));
     }
 
-    public List<SearchElementIdsResp> getElements(@NotNull String requestBody, @NotNull String accessToken) throws BimfaceException {
+    public List<SearchElementIdsResp> getElements(@NotNull String requestBody, Boolean includeOverrides, @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getElements(requestBody, accessToken));
+        return executeCall(dataClient.getElements(requestBody, includeOverrides, accessToken));
     }
 
     public List<SearchRoomIdsResp> getRooms(@NotNull String requestBody, @NotNull String accessToken) throws BimfaceException {
@@ -442,9 +442,10 @@ public class DataClient extends AbstractClient {
     }
 
     public List<PropertyValuesResp> getPropertyValues(@NotNull List<String> targetIds, String targetType,
-                                                      @NotNull List<String> properties, @NotNull String accessToken) throws BimfaceException {
+                                                      @NotNull List<String> properties, Boolean includeOverrides,
+                                                      @NotNull String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
-        return executeCall(dataClient.getPropertyValues(targetIds, targetType, properties, accessToken));
+        return executeCall(dataClient.getPropertyValues(targetIds, targetType, properties, includeOverrides, accessToken));
     }
 
     public String getPaginationContextId(@NotNull String accessToken) throws BimfaceException {
@@ -475,5 +476,28 @@ public class DataClient extends AbstractClient {
     public String getIntegrateDatabagRootUrl(Long integrateId, String accessToken) throws BimfaceException {
         accessToken = validToken(accessToken);
         return executeCall(dataClient.getIntegrateDatabagRootUrl(integrateId, accessToken));
+    }
+
+    public List<DrawingSplitLayout> getDrawingFrames(@NotNull Long fileId, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getDrawingFrames(fileId, accessToken));
+    }
+
+    public List<MEPSystem> getMEPSystem(@NotNull Long fileId, String systemCategory, String systemType,
+                                        @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getMEPSystem(fileId, systemCategory, systemType, accessToken));
+    }
+
+    public List<ElementIdWithBoundingBox> getBoundingBoxes(@NotNull Long integrateId, List<String> fileIdWithEleIdList,
+                                                           @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.getBoundingBoxes(integrateId, fileIdWithEleIdList, accessToken));
+    }
+
+    public Pagination<DrawingCompareDiff> pageGetDrawingCompareResult(@NotNull Long comparisonId, String layer, Integer page,
+                                                                      Integer pageSize, @NotNull String accessToken) throws BimfaceException {
+        accessToken = validToken(accessToken);
+        return executeCall(dataClient.pageGetDrawingCompareResult(comparisonId, layer, page, pageSize, accessToken));
     }
 }

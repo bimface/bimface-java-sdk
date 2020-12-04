@@ -3,6 +3,7 @@ package com.bimface.sdk.service;
 
 import com.bimface.api.bean.response.databagDerivative.DatabagDerivativeBean;
 import com.bimface.exception.BimfaceException;
+import com.bimface.sdk.bean.request.DatabagDerivativeRequest;
 import com.bimface.sdk.bean.request.OfflineDatabagRequest;
 import com.bimface.sdk.client.ApiClient;
 import com.bimface.sdk.client.DataClient;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * 离线数据包
  *
- * @author xxy, 2017-08-23.
+ * @author bimface, 2017-08-23.
  */
 public class OfflineDatabagService {
     private ApiClient apiClient;
@@ -34,12 +35,17 @@ public class OfflineDatabagService {
      * @throws BimfaceException {@link BimfaceException}
      */
     public DatabagDerivativeBean generateOfflineDatabag(OfflineDatabagRequest request) throws BimfaceException {
+        DatabagDerivativeRequest databagDerivativeRequest = new DatabagDerivativeRequest();
+        databagDerivativeRequest.setConfig(request.getConfig());
         if (request.getFileId() != null) {
-            return apiClient.createTranslateOfflineDatabag(request.getFileId(), request.getCallback(), accessTokenService.getAccessToken());
+            return apiClient.createTranslateOfflineDatabag(request.getFileId(), request.getCallback(),
+                    databagDerivativeRequest, accessTokenService.getAccessToken());
         } else if (request.getIntegrateId() != null) {
-            return apiClient.createIntegateOfflineDatabag(request.getIntegrateId(), request.getCallback(), accessTokenService.getAccessToken());
+            return apiClient.createIntegateOfflineDatabag(request.getIntegrateId(), request.getCallback(),
+                    databagDerivativeRequest, accessTokenService.getAccessToken());
         } else if (request.getCompareId() != null) {
-            return apiClient.createCompareOfflineDatabag(request.getCompareId(), request.getCallback(), accessTokenService.getAccessToken());
+            return apiClient.createCompareOfflineDatabag(request.getCompareId(), request.getCallback(),
+                    databagDerivativeRequest, accessTokenService.getAccessToken());
         } else {
             throw new NullPointerException("'fileId', 'integrateId', 'compareId' can't be all empty");
         }
@@ -47,32 +53,72 @@ public class OfflineDatabagService {
 
     /**
      * 查询离线数据包
+     * 已过时：请使用：
+     * {@linkplain com.bimface.sdk.service.OfflineDatabagService#queryOfflineDatabag(java.lang.Long, java.lang.Long,
+     * java.lang.Long) queryOfflineDatabag(java.lang.Long, java.lang.Long, java.lang.Long)}
      *
      * @param request 离线数据包请求
      * @return {@link DatabagDerivativeBean}
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public List<? extends DatabagDerivativeBean> queryOfflineDatabag(OfflineDatabagRequest request) throws BimfaceException {
-        if (request.getFileId() != null) {
-            return apiClient.getTranslateOfflineDatabag(request.getFileId(), accessTokenService.getAccessToken());
-        } else if (request.getIntegrateId() != null) {
-            return apiClient.getIntegateOfflineDatabag(request.getIntegrateId(), accessTokenService.getAccessToken());
-        } else if (request.getCompareId() != null) {
-            return apiClient.getCompareOfflineDatabag(request.getCompareId(), accessTokenService.getAccessToken());
+        return queryOfflineDatabag(request.getFileId(), request.getIntegrateId(), request.getCompareId());
+    }
+
+    /**
+     * 查询离线数据包
+     *
+     * @param fileId
+     * @param integrateId
+     * @param compareId
+     * @return
+     * @throws BimfaceException
+     */
+    public List<? extends DatabagDerivativeBean> queryOfflineDatabag(Long fileId, Long integrateId, Long compareId) throws BimfaceException {
+        if (fileId != null) {
+            return apiClient.getTranslateOfflineDatabag(fileId, accessTokenService.getAccessToken());
+        } else if (integrateId != null) {
+            return apiClient.getIntegrateOfflineDatabag(integrateId, accessTokenService.getAccessToken());
+        } else if (compareId != null) {
+            return apiClient.getCompareOfflineDatabag(compareId, accessTokenService.getAccessToken());
         } else {
             throw new NullPointerException("'fileId', 'integrateId', 'compareId' can't be all empty");
         }
     }
 
     /**
-     * 获取离线数据包信息
+     * 获取离线数据下载链接
+     * 已过时，请使用：
+     * {@linkplain com.bimface.sdk.service.OfflineDatabagService#getOfflineDatabagUrl(java.lang.Long, java.lang.Long,
+     * java.lang.Long, java.lang.String)
+     * getOfflineDatabagUrl(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.String)}
      *
      * @param request 离线数据包请求
      * @return 离线数据包下载地址
      * @throws BimfaceException {@link BimfaceException}
+     * @deprecated
      */
+    @Deprecated
     public String getOfflineDatabagUrl(OfflineDatabagRequest request) throws BimfaceException {
         return dataClient.getDatabagDownloadUrl(request.getFileId(), request.getIntegrateId(), request.getCompareId(),
                 "offline", request.getDatabagVersion(), accessTokenService.getAccessToken());
+    }
+
+    /**
+     * 获取离线数据下载链接
+     * 其中，文件id，集尘id和比较id不能全为空
+     *
+     * @param fileId 文件id
+     * @param integrateId 集成id
+     * @param compareId 比较id
+     * @param databagVersion 数据包版本
+     * @return
+     * @throws BimfaceException
+     */
+    public String getOfflineDatabagUrl(Long fileId, Long integrateId, Long compareId, String databagVersion) throws BimfaceException {
+        return dataClient.getDatabagDownloadUrl(fileId, integrateId, compareId, "offline", databagVersion,
+                accessTokenService.getAccessToken());
     }
 }
